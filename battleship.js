@@ -146,11 +146,13 @@ function fireTorpedo(e) {
                                  k=1;   
                              }
                              if(k==1){
-                                    var sunkShip = document.createElement("div");
                                     arr=ships[property];
                                     for(var item in arr){
                                         var arrElement=arr[item];
                                         console.log(item);
+                                        var element = document.getElementById("s"+arrElement[0]+arrElement[1]);
+                                        element.style.borderWidth="3px";
+                                        element.style.borderColor="black";
                                         coloring(arrElement[0],arrElement[1]); 
                                     }
                              }
