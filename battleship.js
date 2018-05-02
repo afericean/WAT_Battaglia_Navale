@@ -79,7 +79,7 @@ console.log(ships)
 
 function coloring(x,y){
     var coord="s"+x+y;
-     var children=gameBoardContainer.childNodes;
+    var children=gameBoardContainer.childNodes;
     children.forEach(function(child){
         if(child.id==coord)
             child.style.background='#800000';
@@ -104,11 +104,11 @@ function fireTorpedo(e) {
 		// if player clicks a square with no ship, change the color and change square's value
 		if (gameBoard[row][col] == 0) {
 			e.target.style.background = '#0080ff';
-			// set this square's value to 3 to indicate that they fired and missed
-			gameBoard[row][col] = 3;
+			// set this square's value to 1 to indicate that they fired and missed
+			gameBoard[row][col] = 1;
 			
 		// if player clicks a square with a ship, change the color and change square's value
-		} else if (gameBoard[row][col] != 0) {
+		} else if (gameBoard[row][col] != 0 && gameBoard[row][col] != 1) {
 			e.target.style.background = 'red';
             //we set that one ship has been hit
             for(var property in ships)
@@ -146,12 +146,13 @@ function fireTorpedo(e) {
                                  k=1;   
                              }
                              if(k==1){
+                                    var sunkShip = document.createElement("div");
                                     arr=ships[property];
                                     for(var item in arr){
                                         var arrElement=arr[item];
                                         console.log(item);
                                         coloring(arrElement[0],arrElement[1]); 
-                                 }
+                                    }
                              }
                             }
                          
@@ -159,7 +160,7 @@ function fireTorpedo(e) {
             
            
 			// set this square's value to 2 to indicate the ship has been hit
-			//gameBoard[row][col] = 2;
+			gameBoard[row][col] = 1;
 			
 			// increment hitCount each time a ship is hit
 			hitCount++;
@@ -169,7 +170,7 @@ function fireTorpedo(e) {
 			}
 			
 		// if player clicks a square that's been previously hit, let them know
-		} else if (gameBoard[row][col] < 0) {
+		} else if (gameBoard[row][col] == 1) {
 			alert("Stop wasting your torpedos! You already fired at this location.");
 		}		
     }
