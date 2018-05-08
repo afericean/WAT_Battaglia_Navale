@@ -14,7 +14,7 @@ export class MessageListComponent implements OnInit {
 
   private messages: Message[] = [];
 
-  constructor( private sio: SocketioService , private ms: MessageService, private us: UserService, private router: Router ) { }
+  constructor( private sio: SocketioService , private ms: MessageService, private us: UserService, private router: Router) { }
 
   ngOnInit() {
     this.get_messages();
