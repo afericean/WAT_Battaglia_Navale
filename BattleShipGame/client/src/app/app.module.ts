@@ -18,6 +18,7 @@ import { AppRoutingModule } from './/app-routing.module';
 import { UserSignupComponent } from './user-signup/user-signup.component';
 import { SocketioService } from './socketio.service';
 import { GameRoomComponent } from './game-room/game-room.component';
+import { ProfileComponent } from './profile/profile.component';
 
 
 @NgModule({
@@ -27,7 +28,8 @@ import { GameRoomComponent } from './game-room/game-room.component';
     MessageListComponent,
     UserLoginComponent,
     UserSignupComponent,
-    GameRoomComponent
+    GameRoomComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,
