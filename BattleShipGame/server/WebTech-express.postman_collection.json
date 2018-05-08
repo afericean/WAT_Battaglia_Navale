@@ -185,36 +185,7 @@
 			},
 			"response": []
 		},
-		{
-			"name": "list tags",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{JWT_TOKEN}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "https://localhost:8443/tags",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "8443",
-					"path": [
-						"tags"
-					]
-				}
-			},
-			"response": []
-		},
+	
 		{
 			"name": "list messages",
 			"request": {
@@ -255,46 +226,7 @@
 			},
 			"response": []
 		},
-		{
-			"name": "list messages with filter",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{JWT_TOKEN}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "https://localhost:8443/messages?tags=Tag5&tags=Tag1",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "8443",
-					"path": [
-						"messages"
-					],
-					"query": [
-						{
-							"key": "tags",
-							"value": "Tag5"
-						},
-						{
-							"key": "tags",
-							"value": "Tag1"
-						}
-					]
-				}
-			},
-			"response": []
-		},
+	
 		{
 			"name": "post message",
 			"request": {
@@ -317,7 +249,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"content\": \"Messaggio di prova\"\n}"
+					"raw": "{\n\t\"content\": \"Messaggio di prova\"\n}"
 				},
 				"url": {
 					"raw": "https://localhost:8443/messages",

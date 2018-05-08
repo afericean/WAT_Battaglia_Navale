@@ -26,4 +26,7 @@ export class GameRoomComponent implements OnInit {
   profi(){
   this.router.navigate(['/profile']);
   }
+  go(){
+    this.router.navigate(['positioning']);
+  }
 }

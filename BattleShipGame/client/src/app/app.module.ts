@@ -19,6 +19,7 @@ import { UserSignupComponent } from './user-signup/user-signup.component';
 import { SocketioService } from './socketio.service';
 import { GameRoomComponent } from './game-room/game-room.component';
 import { ProfileComponent } from './profile/profile.component';
+import { PositioningComponent } from './positioning/positioning.component';
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import { ProfileComponent } from './profile/profile.component';
     UserLoginComponent,
     UserSignupComponent,
     GameRoomComponent,
-    ProfileComponent
+    ProfileComponent,
+    PositioningComponent
   ],
   imports: [
     BrowserModule,

@@ -2,7 +2,7 @@
 /**
  *  Simple HTTP REST server + MongoDB (Mongoose) + Express
  *
- *  Post and get simple text messages. Each message has a text content, a list of tags
+ *  Post and get simple text messages. Each message has a text content
  *  and an associated timestamp.
  *  All the posted messages are stored in a MongoDB collection.
  *
@@ -14,12 +14,11 @@
  *  Endpoints          Attributes          Method        Description
  *
  *     /                  -                  GET         Returns the version and a list of available endpoints
- *     /messages        ?tags=               GET         Returns all the posted messages, optionally filtered by tags
+ *     /messages        
  *                      ?skip=n
  *                      ?limit=m
  *     /messages          -                  POST        Post a new message
  *     /messages/:id      -                  DELETE      Delete a message by id
- *     /tags              -                  GET         Get a list of tags
  *
  *     /users             -                  GET         List all users
  *     /users/:mail       -                  GET         Get user info by mail
@@ -104,20 +103,10 @@ app.use(bodyparser.json());
 // Add API routes to express application
 //
 app.get("/", (req, res) => {
-    res.status(200).json({ api_version: "1.0", endpoints: ["/messages", "/tags", "/users", "/login"] }); // json method sends a JSON response (setting the correct Content-Type) to the client
-});
-app.get("/tags", auth, (req, res, next) => {
-    message.getModel().distinct("tags").then((taglist) => {
-        return res.status(200).json(taglist);
-    }).catch((reason) => {
-        return next({ statusCode: 404, error: true, errormessage: "DB error: " + reason });
-    });
+    res.status(200).json({ api_version: "1.0", endpoints: ["/messages", "/users", "/login"] }); // json method sends a JSON response (setting the correct Content-Type) to the client
 });
 app.route("/messages").get(auth, (req, res, next) => {
     var filter = {};
-    if (req.query.tags) {
-        filter = { tags: { $all: req.query.tags } };
-    }
     console.log("Using filter: " + JSON.stringify(filter));
     console.log(" Using query: " + JSON.stringify(req.query));
     req.query.skip = parseInt(req.query.skip || "0") || 0;
@@ -263,7 +252,6 @@ mongoose.connect('mongodb://localhost:27017/postmessages').then(function onconne
                 var m1 = message
                     .getModel()
                     .create({
-                    tags: ["Tag1", "Tag2", "Tag3"],
                     content: "Post 1",
                     timestamp: new Date(),
                     authormail: u.mail
@@ -271,7 +259,6 @@ mongoose.connect('mongodb://localhost:27017/postmessages').then(function onconne
                 var m2 = message
                     .getModel()
                     .create({
-                    tags: ["Tag1", "Tag5"],
                     content: "Post 2",
                     timestamp: new Date(),
                     authormail: u.mail
@@ -279,7 +266,6 @@ mongoose.connect('mongodb://localhost:27017/postmessages').then(function onconne
                 var m3 = message
                     .getModel()
                     .create({
-                    tags: ["Tag6", "Tag10"],
                     content: "Post 3",
                     timestamp: new Date(),
                     authormail: u.mail

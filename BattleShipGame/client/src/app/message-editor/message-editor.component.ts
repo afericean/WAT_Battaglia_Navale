@@ -20,16 +20,9 @@ export class MessageEditorComponent implements OnInit {
   }
 
   set_empty() {
-    this.message = { tags: [], content: '', timestamp: new Date(), authormail: '' };
+    this.message = { content: '', timestamp: new Date(), authormail: '' };
   }
 
-  get_tags() {
-    return this.message.tags;
-  }
-
-  add_tag( tag: string ) {
-    this.message.tags = this.message.tags.concat([ tag]);
-  }
 
   post_message( ) {
     this.message.timestamp = new Date();

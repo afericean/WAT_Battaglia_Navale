@@ -47,4 +47,8 @@ export class MessageListComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
+  profile(){
+    this.router.navigate(['profile']);
+  }
+
 }

@@ -2,10 +2,9 @@
 import mongoose = require('mongoose');
 
 
-// A message has some text content, a list of tags and a timestamp
+// A message has some text contentand a timestamp
 //
 export interface Message {
-    tags: string[],
     content: string,
     timestamp: Date,
     authormail: string
@@ -18,7 +17,7 @@ export interface Message {
 // A better approach is to use JSON schema
 //
 export function isMessage(arg: any): arg is Message {
-    return arg && arg.content && typeof(arg.content) == 'string' && arg.tags && Array.isArray(arg.tags) && arg.timestamp && arg.timestamp instanceof Date && arg.authormail && typeof(arg.authormail) == 'string' ;
+    return arg && arg.content && typeof(arg.content) == 'string' && arg.timestamp && arg.timestamp instanceof Date && arg.authormail && typeof(arg.authormail) == 'string' ;
 }
 
 
@@ -31,10 +30,6 @@ export function isMessage(arg: any): arg is Message {
 //
 // Mongoose Schema
 var messageSchema = new mongoose.Schema( {
-    tags: {
-        type: [mongoose.SchemaTypes.String],
-        required: true
-    },
     content:  {
         type: mongoose.SchemaTypes.String,
         required: true 
