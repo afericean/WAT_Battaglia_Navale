@@ -12,6 +12,18 @@ var userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    points:  {
+        type: mongoose.SchemaTypes.Number,
+        required: false 
+    },
+    win:  {
+        type: mongoose.SchemaTypes.Number,
+        required: false 
+    },
+    lost:  {
+        type: mongoose.SchemaTypes.Number,
+        required: false 
+    },
     roles: {
         type: [mongoose.SchemaTypes.String],
         required: true
@@ -71,6 +83,14 @@ userSchema.methods.hasModeratorRole = function () {
 userSchema.methods.setModerator = function () {
     this.roles.push("MODERATOR");
 };
+userSchema.methods.victory = function(){
+    this.win += 1;
+    this.points += 2;
+}
+userSchema.methods.defeat = function(){
+    this.lost += 1;
+    this.points -= 1;
+}
 function getSchema() { return userSchema; }
 exports.getSchema = getSchema;
 // Mongoose Model

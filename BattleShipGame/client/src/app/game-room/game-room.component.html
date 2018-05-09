@@ -1,13 +1,33 @@
 
-<h1><b> Game Room  </b> </h1>
+<nav class="navbar navbar-light bg-light" [style.background-color]="'darkorchid'"><h1><b> Game Room  </b> </h1>
 
-<div class="inline">
-  <br> <br><br>
-   <h2> Search for game </h2>
-   <button type="button" (click)="go()">GO!</button>
-   
+  <ul class="nav justify-content-end bottomfooter">
+      <li class="nav-item">
+        <div class="btn-group dropdown">
+          <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {{us.get_username()}}
+          </button>
+          <div class="dropdown-menu">
+            <div class="dropdown-item" href="#" (click)="profi()">{{us.get_mail()}}</div>
+            <div *ngIf="us.is_admin()" class="dropdown-item" href="#"><i class="fas fa-check"></i> Admin role</div>
+            <div *ngIf="us.is_moderator()" class="dropdown-item" href="#"><i class="fas fa-check"></i> Moderator role</div>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item nav-link" (click)="logout()" >Logout</button>
+          </div>
+        </div>
+      </li>
+    </ul>
+</nav>
+<div class="row">
+<div  class="col-sm-6">
   
+  <br> <br><br>
+  <div class="jumbotron"><h2> Search for game </h2>
+   <button type="button" (click)="go()">GO!</button></div> 
+
 </div>
-<div class="inline"><app-message-list></app-message-list></div>  
+<div  class="col-sm-6"><app-message-list></app-message-list></div>  
+
+</div>
 
 

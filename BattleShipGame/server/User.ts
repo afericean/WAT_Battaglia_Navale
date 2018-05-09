@@ -8,6 +8,9 @@ export interface User extends mongoose.Document {
     username: string,
     mail: string,
     roles: string[],
+    points: number,
+    win: number,
+    lost: number,
     salt: string,
     digest: string,
     setPassword: (pwd:string)=>void,
@@ -16,6 +19,8 @@ export interface User extends mongoose.Document {
     setAdmin: ()=>void,
     hasModeratorRole: ()=>boolean,
     setModerator: ()=>void,
+    victory: ()=>void,
+    defeat: ()=>void  //methods for changing stats of user
 }
 
 var userSchema = new mongoose.Schema( {
@@ -27,6 +32,18 @@ var userSchema = new mongoose.Schema( {
         type: mongoose.SchemaTypes.String,
         required: true,
         unique: true
+    },
+    points:  {
+        type: mongoose.SchemaTypes.Number,
+        required: false 
+    },
+    win:  {
+        type: mongoose.SchemaTypes.Number,
+        required: false 
+    },
+    lost:  {
+        type: mongoose.SchemaTypes.Number,
+        required: false 
     },
     roles:  {
         type: [mongoose.SchemaTypes.String],
@@ -98,6 +115,15 @@ userSchema.methods.setModerator = function() {
     this.roles.push( "MODERATOR" );
 }
 
+userSchema.methods.victory = function(): void{
+    this.win += 1;
+    this.points += 2;
+}
+
+userSchema.methods.defeat = function(): void{
+    this.lost += 1;
+    this.points -= 1;
+}
 
 
 export function getSchema() { return userSchema; }

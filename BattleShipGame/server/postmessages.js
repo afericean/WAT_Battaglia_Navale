@@ -214,7 +214,10 @@ app.get("/login", passport.authenticate('basic', { session: false }), (req, res,
         username: req.user.username,
         roles: req.user.roles,
         mail: req.user.mail,
-        id: req.user.id
+        id: req.user.id,
+        points: req.user.points,
+        win: req.user.win,
+        lost: req.user.lost
     };
     console.log("Login granted. Generating token");
     var token_signed = jsonwebtoken.sign(tokendata, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -239,7 +242,10 @@ mongoose.connect('mongodb://localhost:27017/postmessages').then(function onconne
     console.log("Connected to MongoDB");
     var u = user.newUser({
         username: "admin",
-        mail: "admin@postmessages.it"
+        mail: "admin@postmessages.it",
+        points: 0,
+        win: 0,
+        lost: 0
     });
     u.setAdmin();
     u.setModerator();

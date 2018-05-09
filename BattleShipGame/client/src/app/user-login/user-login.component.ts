@@ -15,7 +15,7 @@ export class UserLoginComponent implements OnInit {
   ngOnInit() {
     this.us.renew().subscribe( (d) => {
       console.log('Renew succeded: ' + JSON.stringify(d) );
-      this.router.navigate(['/messages']);
+      this.router.navigate(['/game-room']);
     }, (err) => {
       console.log('Renew error: ' + JSON.stringify(err.error.errormessage) );
     });

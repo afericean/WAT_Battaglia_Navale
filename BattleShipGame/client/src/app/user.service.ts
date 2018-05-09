@@ -47,6 +47,27 @@ export class UserService {
     return jwtdecode(this.token).id;
   }
 
+  get_points() {
+    return jwtdecode(this.token).points;
+  }
+
+  get_win() {
+    return jwtdecode(this.token).win;
+  }
+
+  get_lost() {
+    return jwtdecode(this.token).lost;
+  }
+
+  //methods for win / loose
+  /*victory() {
+    return jwtdecode(this.token).victory();
+  }
+
+  defeat() {
+    return jwtdecode(this.token).defeat();
+  }*/
+
   is_admin(): boolean {
     const roles = jwtdecode(this.token).roles;
     for ( let idx = 0; idx < roles.length; ++idx ) {

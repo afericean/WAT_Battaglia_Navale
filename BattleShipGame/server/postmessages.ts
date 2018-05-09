@@ -204,12 +204,12 @@ app.get('/users', auth, (req,res,next) => {
 
 app.post('/users', (req,res,next) => {
 
-    var u = user.newUser( req.body );
+    var u = user.newUser( req.body);
+    
     if( !req.body.password ) {
       return next({ statusCode:404, error: true, errormessage: "Password field missing"} );
     }
     u.setPassword( req.body.password );
-
     u.save().then( (data) => {
       return res.status(200).json({ error: false, errormessage: "", id: data._id });
     }).catch( (reason) => {
@@ -283,7 +283,10 @@ app.get("/login", passport.authenticate('basic', { session: false }), (req,res,n
     username: req.user.username,
     roles: req.user.roles,
     mail: req.user.mail,
-    id: req.user.id
+    id: req.user.id,
+    points: req.user.points,
+    win: req.user.win,
+    lost: req.user.lost
   };
 
   console.log("Login granted. Generating token" );
@@ -325,7 +328,10 @@ mongoose.connect( 'mongodb://localhost:27017/postmessages' ).then(
 
         var u = user.newUser( {
           username: "admin",
-          mail: "admin@postmessages.it"
+          mail: "admin@postmessages.it",
+          points: 0,
+          win: 0,
+          lost: 0
         } );
         u.setAdmin();
         u.setModerator();

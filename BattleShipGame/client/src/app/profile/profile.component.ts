@@ -19,7 +19,7 @@ export class ProfileComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  gamero(){
+  gameroom(){
     this.router.navigate(['/game-room']);
     }
 }
