@@ -8,7 +8,7 @@
             {{us.get_username()}}
           </button>
           <div class="dropdown-menu">
-            <div class="dropdown-item" href="#" (click)="profi()">{{us.get_mail()}}</div>
+            <div class="dropdown-item" href="#" (click)="profile()">{{us.get_mail()}}</div>
             <div *ngIf="us.is_admin()" class="dropdown-item" href="#"><i class="fas fa-check"></i> Admin role</div>
             <div *ngIf="us.is_moderator()" class="dropdown-item" href="#"><i class="fas fa-check"></i> Moderator role</div>
             <div class="dropdown-divider"></div>

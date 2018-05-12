@@ -20,7 +20,7 @@ import { SocketioService } from './socketio.service';
 import { GameRoomComponent } from './game-room/game-room.component';
 import { ProfileComponent } from './profile/profile.component';
 import { PositioningComponent } from './positioning/positioning.component';
-
+declare var angular: any;
 
 @NgModule({
   declarations: [

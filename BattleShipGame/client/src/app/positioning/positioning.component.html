@@ -1,1 +1,29 @@
-<div class="loader"></div>
+<!--div  class="loader"></div>-->
+<div class="row">
+
+<div class="col-xs-6" id="gameboard">
+    <div *ngFor="let tile of tiles" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}" (click)="toggle($event)">  
+     </div>
+     
+</div>
+
+<div class="col-xs-6"> 
+    <div id="shipContainer">
+        <div *ngFor="let tile of TwoHShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}"  (click)="click2H()"></div>
+        <div *ngFor="let tile of ThreeHShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}" (click)="click3H()"></div>
+        <div *ngFor="let tile of FourHShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}" (click)="click4H()"></div>
+        <div *ngFor="let tile of FiveHShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}" (click)="click5H()"></div>
+        <div *ngFor="let tile of TwoVShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}" (click)="click2V()"></div>
+        <div *ngFor="let tile of ThreeVShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}"(click)="click3V()"></div>
+        <div *ngFor="let tile of FourVShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}"(click)="click4V()"></div>
+        <div *ngFor="let tile of FiveVShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}"(click)="click5V()"></div> 
+    </div>
+        <div [ngStyle]="{'background':'white','border':'0px'}" >Destroyers:{{destroyer}}</div>
+        <div [ngStyle]="{'background':'white','border':'0px'}" >Submarines:{{submarine}}</div>
+        <div [ngStyle]="{'background':'white','border':'0px'}" >Ironclads:{{ironclad}}</div>
+        <div [ngStyle]="{'background':'white','border':'0px'}" >Aircraft Carriers:{{carrier}}</div>
+        <div [ngStyle]="{'background':'white','border':'0px'}" >Selected Ship Type:{{selected}}</div>
+</div>
+
+
+</div>

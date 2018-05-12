@@ -23,7 +23,7 @@ export class GameRoomComponent implements OnInit {
     this.router.navigate(['/game-room'])
   }
 
-  profi(){
+  profile(){
   this.router.navigate(['/profile']);
   }
   go(){
