@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ElModule } from 'element-angular'
 import { Tile } from '../tile';
 import { Ship } from '../ship';
+import { Piece } from '../piece';
 
 @Component({
   selector: 'app-positioning',
@@ -23,7 +24,13 @@ export class PositioningComponent implements OnInit {
   ironclad: number = 2;
   carrier: number = 1;
   Ships: Ship[] = new Array();
-  selected: String;
+  selected: String = new String();
+  warning: String = null;
+  selectedColor: string = null;
+  selectedInfo: string = null;
+  undoArray: any[] = new Array();
+  info: boolean = true;
+  continue: boolean = false;
 
   constructor() {
     this.TwoHShip=this.createHorizontalShip(2,0);
@@ -50,12 +57,12 @@ export class PositioningComponent implements OnInit {
             ident = String(j) + i;		
     
             // set each grid square's coordinates: multiples of the current row or column number
-            var topPosition = j * 50;
-            var leftPosition = i * 50;			
+            var topPosition = j * 10;
+            var leftPosition = i * 10;			
     
             // use CSS absolute positioning to place each grid square on the page
-            var t = topPosition + 'px';
-            var l = leftPosition + 'px';	
+            var t = topPosition + '%';
+            var l = leftPosition + '%';	
             this.tiles.push({id:ident,top:t,left:l});		
           }
       }
@@ -99,49 +106,280 @@ createVerticalShip(x,position): Tile[] {
 
   click2H(): void
   {
+    this.selectedInfo = "Horizontal Destroyer"
     this.selected = "2H";
+    this.selectedColor = "#996633";
+    this.warning = null;
+    this.info=false;
   }
 
   click3H(): void
   {
+    this.selectedInfo = "Horizontal Submarine"
     this.selected = "3H";
+    this.selectedColor = "#ff0066";
+    this.warning=null;
+    this.info=false;
   }
 
   click4H(): void
   {
+    this.selectedInfo = "Horizontal Ironclad"
     this.selected = "4H";
+    this.selectedColor = "#009900";
+    this.warning=null;
+    this.info=false;
   }
 
   click5H(): void
   {
+    this.selectedInfo = "Horizontal Aircraft Carrier"
     this.selected = "5H";
+    this.selectedColor = "#cc0099";
+    this.warning=null;
+    this.info=false;
   }
 
   click2V(): void
   {
+    this.selectedInfo = "Vertical Destroyer"
     this.selected = "2V";
+    this.selectedColor = "#996633";
+    this.warning=null;
+    this.info=false;
   }
 
   click3V(): void
   {
+    this.selectedInfo = "Vertical Submarine"
     this.selected = "3V";
+    this.selectedColor = "#ff0066";
+    this.warning=null;
+    this.info=false;
   }
 
   click4V(): void
   {
+    this.selectedInfo = "Vertical Ironclad"
     this.selected = "4V";
+    this.selectedColor = "#009900"
+    this.warning=null;
+    this.info=false;
   }
 
   click5V(): void
   {
+    this.selectedInfo = "Vertical Aircraft Carrier"
     this.selected = "5V";
+    this.selectedColor = "#cc0099";
+    this.warning=null;
+    this.info=false;
   }
 
   toggle(event) {  // this is the click in the gameboard
-    console.log(event.target.id); 
-    event.target.style.background='red';
-    
+    if(this.selected.length) //check if something selected
+    {
+      console.log(event.target.id); 
+      var board = document.querySelector("#gameboard");
+      var children = board.children;
+      var id : string = event.target.id;
+      var size = Number(this.selected[0]);
+      var ok : boolean = true;
+    if(this.selected[1]=="H")
+        {
+          var illegal : number = Number(id[1])+size-2;
+          console.log(illegal);
+          var k=0;
+          var nextId : string = id;
+          while(k<=size){
+              console.log("nextId "+nextId);
+              for(var i=0;i<children.length;i++) {
+                if(children[i].getAttribute('id')==nextId)
+                {
+                  var style = window.getComputedStyle(<HTMLElement>children[i]);
+                  var background = style.getPropertyValue('background-color');
+                  background = this.rgb2hex(background);
+                  if(background!="#f6f8f9")
+                      ok = false;
+                }
+            }
+            nextId = id[0] + String((Number(id[1])+k));
+            k++;
+            if(ok==false)
+              break;
+          }
+          if(ok==false)
+          {
+            this.warning = "Incorrect position!";
+          }
+          else if(illegal>=9)
+              {
+                this.warning = "Incorrect position!";
+              }
+                else
+                {
+                  this.warning=null;
+                  var ship = new Ship();
+                  ship.add(id[1],id[0]);
+                  var lastBoat: string[] = new Array(); //for undo
+                  lastBoat.push(id);
+                  event.target.style.background=this.selectedColor;
+                  var k=1;
+                  console.log(size);
+                  while(k<=size-1)
+                    { var nextId : string;
+                      nextId = id[0] + String((Number(id[1])+1));
+                      lastBoat.push(nextId);
+                      //console.log("Next: "+nextId);
+                      for(var i=0;i<children.length;i++) {
+                        if(children[i].getAttribute('id')==nextId)
+                          {
+                            //console.log("True");
+                            id = (<HTMLElement>children[i]).id;
+                            ship.add(id[1],id[0]);
+                            (<HTMLElement>children[i]).style.background=this.selectedColor;
+                          }
+                      }
+                      k++;
+                    }
+                  this.Ships.push(ship);
+                  this.undoArray.push(lastBoat);
+                  if(size==2)
+                    {this.destroyer--;
+                     // this.continueChecker();
+                    }
+                  if(size==3)
+                    {this.submarine--;
+                     // this.continueChecker();
+                    }
+                  if(size==4)
+                    {this.ironclad--;
+                     // this.continueChecker();
+                    }
+                  if(size==5)
+                    {this.carrier--;
+                      //this.continueChecker();
+                    }
+                    
+                  }
+          
+              }
+              else if(this.selected[1]=="V")
+                    {
+                      illegal = Number(id[0])+size-2;
+                      console.log(illegal);
+                      var k=0;
+                      var nextId : string = id;
+                      while(k<=size){
+                          console.log("nextId "+nextId);
+                          for(var i=0;i<children.length;i++) {
+                            if(children[i].getAttribute('id')==nextId)
+                            {
+                              var style = window.getComputedStyle(<HTMLElement>children[i]);
+                              var background = style.getPropertyValue('background-color');
+                              background = this.rgb2hex(background);
+                              if(background!="#f6f8f9")
+                                  ok = false;
+                            }
+                        }
+                        nextId = String((Number(id[0])+k)) + id[1];
+                        k++;
+                        if(ok==false)
+                          break;
+                      }
+                      if(ok==false)
+                      {
+                        this.warning = "Incorrect position!";
+                      }
+                          else if(illegal>=9)
+                          {
+                            this.warning = "Incorrect position!";
+                          }
+                          else
+                          {
+                            this.warning=null;
+                            var ship = new Ship();
+                            ship.add(id[1],id[0]);
+                            var lastBoat: string[] = new Array();  //for undo
+                            lastBoat.push(id);
+                            event.target.style.background=this.selectedColor;
+                            var k=1;
+                            console.log(size);
+                            while(k<=size-1)
+                              { var nextId : string;
+                                nextId = String((Number(id[0])+1))+ id[1];
+                                lastBoat.push(nextId);
+                                //console.log("Next: "+nextId);
+                                for(var i=0;i<children.length;i++) {
+                                  if(children[i].getAttribute('id')==nextId)
+                                    {
+                                      //console.log("True");
+                                      id = (<HTMLElement>children[i]).id;
+                                      ship.add(id[1],id[0]);
+                                      (<HTMLElement>children[i]).style.background=this.selectedColor;
+                                    }
+                                }
+                                k++;
+                              }
+                            this.Ships.push(ship);
+                            this.undoArray.push(lastBoat);
+                            if(size==2)
+                              {this.destroyer--;
+                                //this.continueChecker();
+                              }
+                            if(size==3)
+                              {this.submarine--;
+                                //this.continueChecker();
+                              }
+                            if(size==4)
+                              {this.ironclad--;
+                                //this.continueChecker();
+                              }
+                            if(size==5)
+                              {this.carrier--;
+                                //this.continueChecker();
+                              }
+                  
+                            }
+                    }
+    console.log(this.Ships);
+    }
  }
-  
+ rgb2hex(rgb) { //for reading color
+  rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+  function hex(x) {
+      return ("0" + parseInt(x).toString(16)).slice(-2);
+  }
+  return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+}
+  undo() {
+    if(this.undoArray.length)
+    {
+      var boatToDelete = this.undoArray.pop();
+      if(boatToDelete.length)
+      {
+        this.Ships.pop();
+        var board = document.querySelector("#gameboard");
+        var children = board.children;
+        while(boatToDelete.length)
+          {
+            var k = boatToDelete.pop();
+            for(var i=0;i<children.length;i++) {
+              if(children[i].getAttribute('id')==k)
+                {
+                  (<HTMLElement>children[i]).style.background="#f6f8f9";
+                }
+            }
+          }
+      }
+  }
+    //console.log(this.undoArray);
+    console.log(this.Ships);
+  }
 
+ /* continueChecker() {
+    if(this.destroyer==0 && this.submarine==0&&this.ironclad==0&&this.carrier==0)
+      this.continue = true;
+    console.log("Continue: "+this.continue);
+  }*/
 }

@@ -18,15 +18,17 @@
       </li>
     </ul>
 </nav>
-<div class="row">
-<div  class="col-sm-6">
-  
-  <br> <br><br>
-  <div class="jumbotron"><h2> Search for game </h2>
-   <button type="button" (click)="go()">GO!</button></div> 
 
-</div>
-<div  class="col-sm-6"><app-message-list></app-message-list></div>  
+<div class="row">
+
+  <div  class="col-sm-6">
+    <br> <br><br>
+    <div class="jumbotron"><h2> Search for game </h2>
+    <button type="button" (click)="go()">GO!</button></div> 
+  </div>
+
+  <div class="col-sm-6" [ngStyle]="{'margin-top': '50px'}" ><app-message-list></app-message-list>
+  </div>  
 
 </div>
 

@@ -1,28 +1,61 @@
 <!--div  class="loader"></div>-->
+<nav class="navbar navbar-light bg-light" [style.background-color]="'darkorchid'"><h1><b>Positioning room</b> </h1> </nav>
+
 <div class="row">
 
 <div class="col-xs-6" id="gameboard">
     <div *ngFor="let tile of tiles" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}" (click)="toggle($event)">  
      </div>
+     <h6 *ngIf="info==true" [ngStyle]="{'margin-top': '520px'}">Click on a boat from the right corner and then click where you want to place it on the board!</h6>
+     <!--<button *ngIf="continue==true">Continue</button>-->
      
 </div>
 
 <div class="col-xs-6"> 
     <div id="shipContainer">
-        <div *ngFor="let tile of TwoHShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}"  (click)="click2H()"></div>
-        <div *ngFor="let tile of ThreeHShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}" (click)="click3H()"></div>
-        <div *ngFor="let tile of FourHShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}" (click)="click4H()"></div>
-        <div *ngFor="let tile of FiveHShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}" (click)="click5H()"></div>
-        <div *ngFor="let tile of TwoVShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}" (click)="click2V()"></div>
-        <div *ngFor="let tile of ThreeVShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}"(click)="click3V()"></div>
-        <div *ngFor="let tile of FourVShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}"(click)="click4V()"></div>
-        <div *ngFor="let tile of FiveVShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}"(click)="click5V()"></div> 
+        <div *ngFor="let tile of TwoHShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left, 'background': '#996633'}"  (click)="click2H()"></div>
+        <div *ngFor="let tile of ThreeHShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left, 'background': '#ff0066'}" (click)="click3H()"></div>
+        <div *ngFor="let tile of FourHShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left, 'background': '#009900'}" (click)="click4H()"></div>
+        <div *ngFor="let tile of FiveHShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left, 'background': '#cc0099'}" (click)="click5H()"></div>
+        <div *ngFor="let tile of TwoVShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left, 'background': '#996633'}" (click)="click2V()"></div>
+        <div *ngFor="let tile of ThreeVShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left, 'background': '#ff0066' }"(click)="click3V()"></div>
+        <div *ngFor="let tile of FourVShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left, 'background': '#009900'}"(click)="click4V()"></div>
+        <div *ngFor="let tile of FiveVShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left, 'background': '#cc0099'}"(click)="click5V()"></div> 
     </div>
-        <div [ngStyle]="{'background':'white','border':'0px'}" >Destroyers:{{destroyer}}</div>
-        <div [ngStyle]="{'background':'white','border':'0px'}" >Submarines:{{submarine}}</div>
-        <div [ngStyle]="{'background':'white','border':'0px'}" >Ironclads:{{ironclad}}</div>
-        <div [ngStyle]="{'background':'white','border':'0px'}" >Aircraft Carriers:{{carrier}}</div>
-        <div [ngStyle]="{'background':'white','border':'0px'}" >Selected Ship Type:{{selected}}</div>
+    
+    <div> <b>Selected Ship Type:</b> <b [ngStyle]="{'color': selectedColor}">{{selectedInfo}}</b></div>
+    <div [ngStyle]="{'color':'red'}"  *ngIf="warning"><b>{{warning}}</b></div>
+    <br><br>
+
+    <table class="table">
+        <tr >
+            <td>Type</td> 
+            <td>Size</td>
+            <td>Available</td> 
+        </tr>
+        <tr [ngStyle]="{'color': '#996633'}">
+            <td>Destroyer</td> 
+            <td>1x2 or 2x1</td>
+            <td>{{destroyer}}</td> 
+        </tr>
+        <tr [ngStyle]="{'color': '#ff0066'}" >
+            <td>Submarine</td>
+            <td>1x3 or 3x1</td>
+            <td>{{submarine}}</td>
+        </tr>
+        <tr [ngStyle]="{'color': '#009900'}" >
+            <td>Ironclad</td>
+            <td>1x4 or 4x1</td>
+            <td>{{ironclad}}</td>
+        </tr>
+        <tr [ngStyle]="{'color': '#cc0099'}">
+            <td>Aircraft Carrier</td>
+            <td>1x5 or 5x1</td>
+            <td>{{carrier}}</td>
+        </tr>
+    </table>
+    <button (click)="undo()">Undo</button>
+    
 </div>
 
 

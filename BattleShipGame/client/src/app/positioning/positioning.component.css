@@ -19,7 +19,8 @@
 	position:relative;
 	margin:0 auto 2em auto;
 	width:500px;
-    height:500px;
+	height:500px;
+	margin-top: 3%;
 }
 
 #gameboard div {
@@ -29,15 +30,16 @@
 	box-sizing: border-box;         /* Safari 5.1+, Chrome 10+, Firefox 29+, Opera 7+, IE 8+, Android 4.0+, iOS any */
 	background: #f6f8f9; /* Old browsers */
 	border: 1px solid #ddd;
-	width:50px;
-	height:50px;
+	width:10%;
+	height:10%;
 }
 
 #shipContainer {
 	position:relative;
 	margin:0 auto 2em auto;
 	width:500px;
-    height:300px;
+	height:250px;
+	margin-top: 5%;
 }
 
 #shipContainer div {
@@ -45,8 +47,10 @@
 	-webkit-box-sizing: border-box; /* Safari 3.0 - 5.0, Chrome 1 - 9, Android 2.1 - 3.x */
 	-moz-box-sizing: border-box;    /* Firefox 1 - 28 */
 	box-sizing: border-box;         /* Safari 5.1+, Chrome 10+, Firefox 29+, Opera 7+, IE 8+, Android 4.0+, iOS any */
-	background: red; /* Old browsers */
 	border: 1px solid #ddd;
 	width:50px;
 	height:50px;
+}
+.table{
+	border: 3px;
 }
