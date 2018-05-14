@@ -19,10 +19,7 @@ export class PositioningComponent implements OnInit {
   ThreeVShip: Tile[] = new Array(); 
   FourVShip: Tile[] = new Array();
   FiveVShip: Tile[] = new Array();
-  destroyer: number = 4;
-  submarine: number = 2;
-  ironclad: number = 2;
-  carrier: number = 1;
+  available: number[] = [4, 2, 2, 1];
   Ships: Ship[] = new Array();
   selected: String = new String();
   warning: String = null;
@@ -30,7 +27,6 @@ export class PositioningComponent implements OnInit {
   selectedInfo: string = null;
   undoArray: any[] = new Array();
   info: boolean = true;
-  continue: boolean = false;
 
   constructor() {
     this.TwoHShip=this.createHorizontalShip(2,0);
@@ -111,6 +107,10 @@ createVerticalShip(x,position): Tile[] {
     this.selectedColor = "#996633";
     this.warning = null;
     this.info=false;
+    if(this.available[0]==0)
+    {
+      this.warning = "You do not have anymore Destroyers available!";
+    }
   }
 
   click3H(): void
@@ -120,6 +120,10 @@ createVerticalShip(x,position): Tile[] {
     this.selectedColor = "#ff0066";
     this.warning=null;
     this.info=false;
+    if(this.available[1]==0)
+    {
+      this.warning = "You do not have anymore Submarines available!";
+    }
   }
 
   click4H(): void
@@ -129,6 +133,10 @@ createVerticalShip(x,position): Tile[] {
     this.selectedColor = "#009900";
     this.warning=null;
     this.info=false;
+    if(this.available[2]==0)
+    {
+      this.warning = "You do not have anymore Ironclads available!";
+    }
   }
 
   click5H(): void
@@ -138,6 +146,10 @@ createVerticalShip(x,position): Tile[] {
     this.selectedColor = "#cc0099";
     this.warning=null;
     this.info=false;
+    if(this.available[3]==0)
+    {
+      this.warning = "You do not have anymore Aircraft Carriers available!";
+    }
   }
 
   click2V(): void
@@ -147,6 +159,10 @@ createVerticalShip(x,position): Tile[] {
     this.selectedColor = "#996633";
     this.warning=null;
     this.info=false;
+    if(this.available[0]==0)
+    {
+      this.warning = "You do not have anymore Destroyers available!";
+    }
   }
 
   click3V(): void
@@ -156,6 +172,10 @@ createVerticalShip(x,position): Tile[] {
     this.selectedColor = "#ff0066";
     this.warning=null;
     this.info=false;
+    if(this.available[1]==0)
+    {
+      this.warning = "You do not have anymore Submarines available!";
+    }
   }
 
   click4V(): void
@@ -165,6 +185,10 @@ createVerticalShip(x,position): Tile[] {
     this.selectedColor = "#009900"
     this.warning=null;
     this.info=false;
+    if(this.available[2]==0)
+    {
+      this.warning = "You do not have anymore Ironclads available!";
+    }
   }
 
   click5V(): void
@@ -174,6 +198,10 @@ createVerticalShip(x,position): Tile[] {
     this.selectedColor = "#cc0099";
     this.warning=null;
     this.info=false;
+    if(this.available[3]==0)
+    {
+      this.warning = "You do not have anymore Aircraft Carriers available!";
+    }
   }
 
   toggle(event) {  // this is the click in the gameboard
@@ -185,7 +213,11 @@ createVerticalShip(x,position): Tile[] {
       var id : string = event.target.id;
       var size = Number(this.selected[0]);
       var ok : boolean = true;
-    if(this.selected[1]=="H")
+    if(this.available[size-2]==0)
+    {
+      this.warning = "You have exhausted this type of ship!";
+    }
+    else if(this.selected[1]=="H")
         {
           var illegal : number = Number(id[1])+size-2;
           console.log(illegal);
@@ -244,23 +276,7 @@ createVerticalShip(x,position): Tile[] {
                     }
                   this.Ships.push(ship);
                   this.undoArray.push(lastBoat);
-                  if(size==2)
-                    {this.destroyer--;
-                     // this.continueChecker();
-                    }
-                  if(size==3)
-                    {this.submarine--;
-                     // this.continueChecker();
-                    }
-                  if(size==4)
-                    {this.ironclad--;
-                     // this.continueChecker();
-                    }
-                  if(size==5)
-                    {this.carrier--;
-                      //this.continueChecker();
-                    }
-                    
+                  this.available[size-2]--;
                   }
           
               }
@@ -323,23 +339,7 @@ createVerticalShip(x,position): Tile[] {
                               }
                             this.Ships.push(ship);
                             this.undoArray.push(lastBoat);
-                            if(size==2)
-                              {this.destroyer--;
-                                //this.continueChecker();
-                              }
-                            if(size==3)
-                              {this.submarine--;
-                                //this.continueChecker();
-                              }
-                            if(size==4)
-                              {this.ironclad--;
-                                //this.continueChecker();
-                              }
-                            if(size==5)
-                              {this.carrier--;
-                                //this.continueChecker();
-                              }
-                  
+                            this.available[size-2]--;
                             }
                     }
     console.log(this.Ships);
@@ -356,6 +356,7 @@ createVerticalShip(x,position): Tile[] {
     if(this.undoArray.length)
     {
       var boatToDelete = this.undoArray.pop();
+      this.available[boatToDelete.length-2]++;
       if(boatToDelete.length)
       {
         this.Ships.pop();
@@ -377,9 +378,4 @@ createVerticalShip(x,position): Tile[] {
     console.log(this.Ships);
   }
 
- /* continueChecker() {
-    if(this.destroyer==0 && this.submarine==0&&this.ironclad==0&&this.carrier==0)
-      this.continue = true;
-    console.log("Continue: "+this.continue);
-  }*/
 }

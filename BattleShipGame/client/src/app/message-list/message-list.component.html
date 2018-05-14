@@ -1,6 +1,6 @@
 <app-message-editor (posted)="get_messages()" ></app-message-editor>
 
-<div *ngFor="let message of messages" class="card" style="margin: 5px" > 
+<div *ngFor="let message of messages" class="card" style="margin: 5px "> 
     <div class="card-body">
         <h5 class="card-title"><i class="far fa-envelope"></i>&nbsp;{{message.authormail}}</h5>        
         <h6 class="card-subtitle mb-2 text-muted">{{message.timestamp | date}} / {{message.timestamp | date:'shortTime'}}</h6>

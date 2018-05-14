@@ -6,8 +6,8 @@
 <div class="col-xs-6" id="gameboard">
     <div *ngFor="let tile of tiles" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}" (click)="toggle($event)">  
      </div>
-     <h6 *ngIf="info==true" [ngStyle]="{'margin-top': '520px'}">Click on a boat from the right corner and then click where you want to place it on the board!</h6>
-     <!--<button *ngIf="continue==true">Continue</button>-->
+     <h6 *ngIf="info" [ngStyle]="{'margin-top': '520px'}">Click on a boat from the right corner and then click where you want to place it on the board!</h6>
+     <button *ngIf="Ships.length==9" [ngStyle]="{'margin-top': '520px'}">Continue</button>
      
 </div>
 
@@ -36,22 +36,22 @@
         <tr [ngStyle]="{'color': '#996633'}">
             <td>Destroyer</td> 
             <td>1x2 or 2x1</td>
-            <td>{{destroyer}}</td> 
+            <td>{{available[0]}}</td> 
         </tr>
         <tr [ngStyle]="{'color': '#ff0066'}" >
             <td>Submarine</td>
             <td>1x3 or 3x1</td>
-            <td>{{submarine}}</td>
+            <td>{{available[1]}}</td>
         </tr>
         <tr [ngStyle]="{'color': '#009900'}" >
             <td>Ironclad</td>
             <td>1x4 or 4x1</td>
-            <td>{{ironclad}}</td>
+            <td>{{available[2]}}</td>
         </tr>
         <tr [ngStyle]="{'color': '#cc0099'}">
             <td>Aircraft Carrier</td>
             <td>1x5 or 5x1</td>
-            <td>{{carrier}}</td>
+            <td>{{available[3]}}</td>
         </tr>
     </table>
     <button (click)="undo()">Undo</button>
