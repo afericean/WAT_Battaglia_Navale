@@ -1,0 +1,16 @@
+import { Injectable } from '@angular/core';
+import { Ship } from './ship';
+import { Piece } from './piece';
+
+@Injectable()
+export class PositioningService {
+  selected: String = new String();
+  Ships: Ship[] = new Array();
+  warning: String = null;
+  available: number[] = [4, 2, 2, 1];
+  undoArray: any[] = new Array();
+  selectedColor: string = null;
+  info: boolean = true;
+  constructor() { }
+
+}

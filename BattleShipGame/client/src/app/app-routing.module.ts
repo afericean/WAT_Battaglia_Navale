@@ -8,6 +8,7 @@ import { UserSignupComponent } from './user-signup/user-signup.component';
 import { GameRoomComponent } from './game-room/game-room.component';
 import{ ProfileComponent } from './profile/profile.component';
 import{ PositioningComponent } from './positioning/positioning.component';
+import{ PlayingComponent } from './playing/playing.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -16,7 +17,8 @@ const routes: Routes = [
   { path: 'messages', component: MessageListComponent },
   { path: 'game-room', component: GameRoomComponent },
   { path: 'profile',component: ProfileComponent },
-  { path: 'positioning',component: PositioningComponent }
+  { path: 'positioning',component: PositioningComponent },
+  { path: 'playing',component: PlayingComponent }
 ];
 
 @NgModule({

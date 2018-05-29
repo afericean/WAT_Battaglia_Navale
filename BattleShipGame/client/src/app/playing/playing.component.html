@@ -1,0 +1,19 @@
+<div class="row">
+        <div class="col-xs-6">   
+                <h4 id="h4">Oponnent Board</h4>
+                <div id="gameboard-shooting" >
+                        <div *ngFor="let tile of tilesShooting" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}"  (click)="toggle($event)">   
+                        </div>    
+                </div>
+        <div *ngIf="ps.warning"  [ngStyle]="{'color':'red', 'top': '520px'}"  ><b>{{ps.warning}}</b></div>  
+        </div>
+
+        <div class="col-sm-6">
+                <h4 id="h4">My Board</h4>
+                <div id="gameboard" >
+                        <div *ngFor="let tile of tilesPositioning" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}">   
+                        </div>       
+                        <button *ngIf="buttonShow()" [ngStyle]="{'position':'absolute', 'top': '520px'}" (click)="toggle($event)">Show my boats!</button>  
+                </div>
+        </div>
+</div>

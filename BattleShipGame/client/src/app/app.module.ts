@@ -20,6 +20,9 @@ import { SocketioService } from './socketio.service';
 import { GameRoomComponent } from './game-room/game-room.component';
 import { ProfileComponent } from './profile/profile.component';
 import { PositioningComponent } from './positioning/positioning.component';
+import { GameboardPositioningComponent } from './gameboard-positioning/gameboard-positioning.component';
+import { PositioningService } from './positioning.service';
+import { PlayingComponent } from './playing/playing.component';
 declare var angular: any;
 
 @NgModule({
@@ -31,7 +34,9 @@ declare var angular: any;
     UserSignupComponent,
     GameRoomComponent,
     ProfileComponent,
-    PositioningComponent
+    PositioningComponent,
+    GameboardPositioningComponent,
+    PlayingComponent
   ],
   imports: [
     BrowserModule,
@@ -42,7 +47,8 @@ declare var angular: any;
   providers: [
     {provide: UserService, useClass: UserHttpService },
     {provide: SocketioService, useClass: SocketioService },
-    {provide: MessageService, useClass: MessageHttpService /* Here we can select the specifc service instance */}
+    {provide: MessageService, useClass: MessageHttpService /* Here we can select the specifc service instance */},
+    {provide: PositioningService, useClass: PositioningService}
   ],
   bootstrap: [AppComponent]
 })

@@ -6,4 +6,7 @@ export class Ship {
         var newPiece= new Piece(x,y);
         this.Ship.push(newPiece);
     }
+    getShip(): Piece[] {
+        return this.Ship;
+    }
 }

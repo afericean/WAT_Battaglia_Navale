@@ -3,6 +3,7 @@ import { ElModule } from 'element-angular'
 import { Tile } from '../tile';
 import { Ship } from '../ship';
 import { Piece } from '../piece';
+import { PositioningService } from '../positioning.service';
 
 @Component({
   selector: 'app-positioning',
@@ -10,7 +11,6 @@ import { Piece } from '../piece';
   styleUrls: ['./positioning.component.css']
 })
 export class PositioningComponent implements OnInit {
-  tiles: Tile[] = new Array();
   TwoHShip: Tile[] = new Array(); 
   ThreeHShip: Tile[] = new Array();
   FourHShip: Tile[] = new Array();
@@ -19,16 +19,10 @@ export class PositioningComponent implements OnInit {
   ThreeVShip: Tile[] = new Array(); 
   FourVShip: Tile[] = new Array();
   FiveVShip: Tile[] = new Array();
-  available: number[] = [4, 2, 2, 1];
-  Ships: Ship[] = new Array();
-  selected: String = new String();
-  warning: String = null;
-  selectedColor: string = null;
   selectedInfo: string = null;
-  undoArray: any[] = new Array();
-  info: boolean = true;
+  
 
-  constructor() {
+  constructor(private ps: PositioningService) {
     this.TwoHShip=this.createHorizontalShip(2,0);
     this.ThreeHShip=this.createHorizontalShip(3,60);
     this.FourHShip=this.createHorizontalShip(4,120);
@@ -40,29 +34,9 @@ export class PositioningComponent implements OnInit {
    }
 
   ngOnInit() {
-    this.populateTiles();
   }
  
-  populateTiles(): void {
-    // make the grid columns and rows
-    for (var i = 0; i < 10; i++) { //columns
-        for (var j = 0; j < 10; j++) { //rows
-    
-            var ident: string;
-            // give each div element a unique id based on its row and column, like "00"
-            ident = String(j) + i;		
-    
-            // set each grid square's coordinates: multiples of the current row or column number
-            var topPosition = j * 10;
-            var leftPosition = i * 10;			
-    
-            // use CSS absolute positioning to place each grid square on the page
-            var t = topPosition + '%';
-            var l = leftPosition + '%';	
-            this.tiles.push({id:ident,top:t,left:l});		
-          }
-      }
-}
+
 
 createHorizontalShip(x,position): Tile[] {
   var HorizontalShip: Tile[] = new Array();
@@ -103,263 +77,115 @@ createVerticalShip(x,position): Tile[] {
   click2H(): void
   {
     this.selectedInfo = "Horizontal Destroyer"
-    this.selected = "2H";
-    this.selectedColor = "#996633";
-    this.warning = null;
-    this.info=false;
-    if(this.available[0]==0)
+    this.ps.selected = "2H";
+    this.ps.selectedColor = "#996633";
+    this.ps.warning = null;
+    this.ps.info=false;
+    if(this.ps.available[0]==0)
     {
-      this.warning = "You do not have anymore Destroyers available!";
+      this.ps.warning = "You do not have anymore Destroyers available!";
     }
   }
 
   click3H(): void
   {
     this.selectedInfo = "Horizontal Submarine"
-    this.selected = "3H";
-    this.selectedColor = "#ff0066";
-    this.warning=null;
-    this.info=false;
-    if(this.available[1]==0)
+    this.ps.selected = "3H";
+    this.ps.selectedColor = "#ff0066";
+    this.ps.warning=null;
+    this.ps.info=false;
+    if(this.ps.available[1]==0)
     {
-      this.warning = "You do not have anymore Submarines available!";
+      this.ps.warning = "You do not have anymore Submarines available!";
     }
   }
 
   click4H(): void
   {
     this.selectedInfo = "Horizontal Ironclad"
-    this.selected = "4H";
-    this.selectedColor = "#009900";
-    this.warning=null;
-    this.info=false;
-    if(this.available[2]==0)
+    this.ps.selected = "4H";
+    this.ps.selectedColor = "#009900";
+    this.ps.warning=null;
+    this.ps.info=false;
+    if(this.ps.available[2]==0)
     {
-      this.warning = "You do not have anymore Ironclads available!";
+      this.ps.warning = "You do not have anymore Ironclads available!";
     }
   }
 
   click5H(): void
   {
     this.selectedInfo = "Horizontal Aircraft Carrier"
-    this.selected = "5H";
-    this.selectedColor = "#cc0099";
-    this.warning=null;
-    this.info=false;
-    if(this.available[3]==0)
+    this.ps.selected = "5H";
+    this.ps.selectedColor = "#cc0099";
+    this.ps.warning=null;
+    this.ps.info=false;
+    if(this.ps.available[3]==0)
     {
-      this.warning = "You do not have anymore Aircraft Carriers available!";
+      this.ps.warning = "You do not have anymore Aircraft Carriers available!";
     }
   }
 
   click2V(): void
   {
     this.selectedInfo = "Vertical Destroyer"
-    this.selected = "2V";
-    this.selectedColor = "#996633";
-    this.warning=null;
-    this.info=false;
-    if(this.available[0]==0)
+    this.ps.selected = "2V";
+    this.ps.selectedColor = "#996633";
+    this.ps.warning=null;
+    this.ps.info=false;
+    if(this.ps.available[0]==0)
     {
-      this.warning = "You do not have anymore Destroyers available!";
+      this.ps.warning = "You do not have anymore Destroyers available!";
     }
   }
 
   click3V(): void
   {
     this.selectedInfo = "Vertical Submarine"
-    this.selected = "3V";
-    this.selectedColor = "#ff0066";
-    this.warning=null;
-    this.info=false;
-    if(this.available[1]==0)
+    this.ps.selected = "3V";
+    this.ps.selectedColor = "#ff0066";
+    this.ps.warning=null;
+    this.ps.info=false;
+    if(this.ps.available[1]==0)
     {
-      this.warning = "You do not have anymore Submarines available!";
+      this.ps.warning = "You do not have anymore Submarines available!";
     }
   }
 
   click4V(): void
   {
     this.selectedInfo = "Vertical Ironclad"
-    this.selected = "4V";
-    this.selectedColor = "#009900"
-    this.warning=null;
-    this.info=false;
-    if(this.available[2]==0)
+    this.ps.selected = "4V";
+    this.ps.selectedColor = "#009900"
+    this.ps.warning=null;
+    this.ps.info=false;
+    if(this.ps.available[2]==0)
     {
-      this.warning = "You do not have anymore Ironclads available!";
+      this.ps.warning = "You do not have anymore Ironclads available!";
     }
   }
 
   click5V(): void
   {
     this.selectedInfo = "Vertical Aircraft Carrier"
-    this.selected = "5V";
-    this.selectedColor = "#cc0099";
-    this.warning=null;
-    this.info=false;
-    if(this.available[3]==0)
+    this.ps.selected = "5V";
+    this.ps.selectedColor = "#cc0099";
+    this.ps.warning=null;
+    this.ps.info=false;
+    if(this.ps.available[3]==0)
     {
-      this.warning = "You do not have anymore Aircraft Carriers available!";
+      this.ps.warning = "You do not have anymore Aircraft Carriers available!";
     }
   }
 
-  toggle(event) {  // this is the click in the gameboard
-    if(this.selected.length) //check if something selected
-    {
-      console.log(event.target.id); 
-      var board = document.querySelector("#gameboard");
-      var children = board.children;
-      var id : string = event.target.id;
-      var size = Number(this.selected[0]);
-      var ok : boolean = true;
-    if(this.available[size-2]==0)
-    {
-      this.warning = "You have exhausted this type of ship!";
-    }
-    else if(this.selected[1]=="H")
-        {
-          var illegal : number = Number(id[1])+size-2;
-          console.log(illegal);
-          var k=0;
-          var nextId : string = id;
-          while(k<=size){
-              console.log("nextId "+nextId);
-              for(var i=0;i<children.length;i++) {
-                if(children[i].getAttribute('id')==nextId)
-                {
-                  var style = window.getComputedStyle(<HTMLElement>children[i]);
-                  var background = style.getPropertyValue('background-color');
-                  background = this.rgb2hex(background);
-                  if(background!="#f6f8f9")
-                      ok = false;
-                }
-            }
-            nextId = id[0] + String((Number(id[1])+k));
-            k++;
-            if(ok==false)
-              break;
-          }
-          if(ok==false)
-          {
-            this.warning = "Incorrect position!";
-          }
-          else if(illegal>=9)
-              {
-                this.warning = "Incorrect position!";
-              }
-                else
-                {
-                  this.warning=null;
-                  var ship = new Ship();
-                  ship.add(id[1],id[0]);
-                  var lastBoat: string[] = new Array(); //for undo
-                  lastBoat.push(id);
-                  event.target.style.background=this.selectedColor;
-                  var k=1;
-                  console.log(size);
-                  while(k<=size-1)
-                    { var nextId : string;
-                      nextId = id[0] + String((Number(id[1])+1));
-                      lastBoat.push(nextId);
-                      //console.log("Next: "+nextId);
-                      for(var i=0;i<children.length;i++) {
-                        if(children[i].getAttribute('id')==nextId)
-                          {
-                            //console.log("True");
-                            id = (<HTMLElement>children[i]).id;
-                            ship.add(id[1],id[0]);
-                            (<HTMLElement>children[i]).style.background=this.selectedColor;
-                          }
-                      }
-                      k++;
-                    }
-                  this.Ships.push(ship);
-                  this.undoArray.push(lastBoat);
-                  this.available[size-2]--;
-                  }
-          
-              }
-              else if(this.selected[1]=="V")
-                    {
-                      illegal = Number(id[0])+size-2;
-                      console.log(illegal);
-                      var k=0;
-                      var nextId : string = id;
-                      while(k<=size){
-                          console.log("nextId "+nextId);
-                          for(var i=0;i<children.length;i++) {
-                            if(children[i].getAttribute('id')==nextId)
-                            {
-                              var style = window.getComputedStyle(<HTMLElement>children[i]);
-                              var background = style.getPropertyValue('background-color');
-                              background = this.rgb2hex(background);
-                              if(background!="#f6f8f9")
-                                  ok = false;
-                            }
-                        }
-                        nextId = String((Number(id[0])+k)) + id[1];
-                        k++;
-                        if(ok==false)
-                          break;
-                      }
-                      if(ok==false)
-                      {
-                        this.warning = "Incorrect position!";
-                      }
-                          else if(illegal>=9)
-                          {
-                            this.warning = "Incorrect position!";
-                          }
-                          else
-                          {
-                            this.warning=null;
-                            var ship = new Ship();
-                            ship.add(id[1],id[0]);
-                            var lastBoat: string[] = new Array();  //for undo
-                            lastBoat.push(id);
-                            event.target.style.background=this.selectedColor;
-                            var k=1;
-                            console.log(size);
-                            while(k<=size-1)
-                              { var nextId : string;
-                                nextId = String((Number(id[0])+1))+ id[1];
-                                lastBoat.push(nextId);
-                                //console.log("Next: "+nextId);
-                                for(var i=0;i<children.length;i++) {
-                                  if(children[i].getAttribute('id')==nextId)
-                                    {
-                                      //console.log("True");
-                                      id = (<HTMLElement>children[i]).id;
-                                      ship.add(id[1],id[0]);
-                                      (<HTMLElement>children[i]).style.background=this.selectedColor;
-                                    }
-                                }
-                                k++;
-                              }
-                            this.Ships.push(ship);
-                            this.undoArray.push(lastBoat);
-                            this.available[size-2]--;
-                            }
-                    }
-    console.log(this.Ships);
-    }
- }
- rgb2hex(rgb) { //for reading color
-  rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-  function hex(x) {
-      return ("0" + parseInt(x).toString(16)).slice(-2);
-  }
-  return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
-}
   undo() {
-    if(this.undoArray.length)
+    if(this.ps.undoArray.length)
     {
-      var boatToDelete = this.undoArray.pop();
-      this.available[boatToDelete.length-2]++;
+      var boatToDelete = this.ps.undoArray.pop();
+      this.ps.available[boatToDelete.length-2]++;
       if(boatToDelete.length)
       {
-        this.Ships.pop();
+        this.ps.Ships.pop();
         var board = document.querySelector("#gameboard");
         var children = board.children;
         while(boatToDelete.length)
@@ -375,7 +201,7 @@ createVerticalShip(x,position): Tile[] {
       }
   }
     //console.log(this.undoArray);
-    console.log(this.Ships);
+    console.log(this.ps.Ships);
   }
 
 }

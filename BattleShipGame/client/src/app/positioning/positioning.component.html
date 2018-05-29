@@ -3,15 +3,13 @@
 
 <div class="row">
 
-<div class="col-xs-6" id="gameboard">
-    <div *ngFor="let tile of tiles" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}" (click)="toggle($event)">  
-     </div>
-     <h6 *ngIf="info" [ngStyle]="{'margin-top': '520px'}">Click on a boat from the right corner and then click where you want to place it on the board!</h6>
-     <button *ngIf="Ships.length==9" [ngStyle]="{'margin-top': '520px'}">Continue</button>
-     
+<div class="col-xs-6" [ngStyle]="{'margin-left': '5%'}" >
+        <app-gameboard-positioning></app-gameboard-positioning>
 </div>
+    
 
-<div class="col-xs-6"> 
+
+<div class="col-xs-6" [ngStyle]="{'margin-left': '5%'}" > 
     <div id="shipContainer">
         <div *ngFor="let tile of TwoHShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left, 'background': '#996633'}"  (click)="click2H()"></div>
         <div *ngFor="let tile of ThreeHShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left, 'background': '#ff0066'}" (click)="click3H()"></div>
@@ -23,8 +21,8 @@
         <div *ngFor="let tile of FiveVShip" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left, 'background': '#cc0099'}"(click)="click5V()"></div> 
     </div>
     
-    <div> <b>Selected Ship Type:</b> <b [ngStyle]="{'color': selectedColor}">{{selectedInfo}}</b></div>
-    <div [ngStyle]="{'color':'red'}"  *ngIf="warning"><b>{{warning}}</b></div>
+    <div id="selected"> <b>Selected Ship Type:</b> <b [ngStyle]="{'color': ps.selectedColor}">{{selectedInfo}}</b></div>
+    <div [ngStyle]="{'color':'red'}"  *ngIf="ps.warning"><b>{{ps.warning}}</b></div>
     <br><br>
 
     <table class="table">
@@ -36,22 +34,22 @@
         <tr [ngStyle]="{'color': '#996633'}">
             <td>Destroyer</td> 
             <td>1x2 or 2x1</td>
-            <td>{{available[0]}}</td> 
+            <td>{{ps.available[0]}}</td> 
         </tr>
         <tr [ngStyle]="{'color': '#ff0066'}" >
             <td>Submarine</td>
             <td>1x3 or 3x1</td>
-            <td>{{available[1]}}</td>
+            <td>{{ps.available[1]}}</td>
         </tr>
         <tr [ngStyle]="{'color': '#009900'}" >
             <td>Ironclad</td>
             <td>1x4 or 4x1</td>
-            <td>{{available[2]}}</td>
+            <td>{{ps.available[2]}}</td>
         </tr>
         <tr [ngStyle]="{'color': '#cc0099'}">
             <td>Aircraft Carrier</td>
             <td>1x5 or 5x1</td>
-            <td>{{available[3]}}</td>
+            <td>{{ps.available[3]}}</td>
         </tr>
     </table>
     <button (click)="undo()">Undo</button>
