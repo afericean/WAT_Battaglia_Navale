@@ -14,17 +14,27 @@
  *  Endpoints          Attributes          Method        Description
  *
  *     /                  -                  GET         Returns the version and a list of available endpoints
- *     /messages        
+ *     /messages
  *                      ?skip=n
  *                      ?limit=m
  *     /messages          -                  POST        Post a new message
  *     /messages/:id      -                  DELETE      Delete a message by id
+
  *
  *     /users             -                  GET         List all users
  *     /users/:mail       -                  GET         Get user info by mail
  *     /users             -                  POST        Add a new user
  *     /login             -                  POST        login an existing user, returning a JWT
  *
+ *     /create            -                  POST        create a game
+ *
+ *     /games             -                  GET          returns all created games
+ *
+ *     /join              -                  POST         join a game
+ *
+ *     /status            -                  POST         send id and returns status of the created game
+ *
+ *     /sendShips                             POST         send ships to one of the players
  *
  * ------------------------------------------------------------------------------------
  *  To install the required modules:
@@ -87,6 +97,10 @@ const jsonwebtoken = require("jsonwebtoken"); // JWT generation
 const jwt = require("express-jwt"); // JWT parsing middleware for express
 const cors = require("cors"); // Enable CORS middleware
 const io = require("socket.io"); // Socket.io websocket library
+//this is the logic of the game keeper
+const game_1 = require("./game");
+const ship_1 = require("./ship");
+var games = new Array();
 var ios = undefined;
 var app = express();
 // We create the JWT authentication middleware
@@ -103,7 +117,7 @@ app.use(bodyparser.json());
 // Add API routes to express application
 //
 app.get("/", (req, res) => {
-    res.status(200).json({ api_version: "1.0", endpoints: ["/messages", "/users", "/login"] }); // json method sends a JSON response (setting the correct Content-Type) to the client
+    res.status(200).json({ api_version: "1.0", endpoints: ["/messages", "/users", "/login", "/create", "/games", "/join", "/status"] }); // json method sends a JSON response (setting the correct Content-Type) to the client
 });
 app.route("/messages").get(auth, (req, res, next) => {
     var filter = {};
@@ -167,6 +181,98 @@ app.post('/users', (req, res, next) => {
         return next({ statusCode: 404, error: true, errormessage: "DB error: " + reason.errmsg });
     });
 });
+app.route("/create").post((req, res, next) => {
+    var game = new game_1.Game(req.body.id);
+    games.push(game);
+    console.log("ID of player one : " + game.idPlayerOne);
+    console.log("Array of games : " + games.length);
+    return res.status(200).json(game.idPlayerOne);
+});
+app.route("/join").post((req, res, next) => {
+    console.log("attempt to join game");
+    var id1 = req.body.id1;
+    var id2 = req.body.id2;
+    console.log("The 2 ids: " + id1 + " " + id2);
+    for (var i = 0; i < games.length; i++) {
+        if (games[i].idPlayerOne == id1) {
+            console.log("True: " + id2);
+            games[i].joinSecondPlayer(id2);
+            console.log("Game joined-  player one : " + games[i].idPlayerOne);
+            console.log("Game joined-  player two : " + games[i].idPlayerTwo);
+        }
+    }
+    return res.status(200).json(id2);
+});
+app.route("/status").post((req, res, next) => {
+    console.log("check if " + req.body.id + " game is full");
+    var id = req.body.id;
+    var ok = false;
+    for (var i = 0; i < games.length; i++) {
+        if (games[i].idPlayerOne == id && games[i].getFull()) {
+            console.log("Game will start!");
+            console.log("Full game -  player one : " + games[i].idPlayerOne);
+            console.log("Full game -  player two : " + games[i].idPlayerTwo);
+            games[i].createGameId();
+            console.log("Game ID: " + games[i].gameID);
+            console.log("Whose turn is it: " + games[i].turn);
+            ok = true;
+        }
+    }
+    console.log("Status " + ok);
+    return res.status(200).json(ok);
+});
+app.route("/sendShips").post((req, res, next) => {
+    console.log("send to " + req.body.id);
+    var id = req.body.id;
+    var ships = req.body.ships;
+    console.log(JSON.stringify(req.body.ship));
+    var ship = JSON.parse(JSON.stringify(req.body.ship));
+    console.log(ship);
+    console.log(ship.Ship);
+    var pieceArray = ship.Ship;
+    var newShip = new ship_1.Ship();
+    for (var i = 0; i < pieceArray.length; i++) {
+        var x = pieceArray[i].x;
+        var y = pieceArray[i].y;
+        newShip.add(x, y);
+        console.log("A piece: " + pieceArray[i].x + " : " + pieceArray[i].y);
+    }
+    console.log("Ship to be added : " + newShip.toString());
+    for (var i = 0; i < games.length; i++) {
+        if (games[i].getFull()) {
+            if (id == games[i].idPlayerOne) {
+                games[i].addToPlayerOne(newShip);
+                console.log("Ship added to player one : " + newShip);
+                var p = newShip.getPiece(0);
+                console.log("First piece : " + p.x + " : " + p.y);
+            }
+            else if (id == games[i].idPlayerTwo) {
+                games[i].addToPlayerTwo(newShip);
+                console.log("Ship added to player two : " + newShip);
+                var p = newShip.getPiece(0);
+                console.log("First piece : " + p.x + " : " + p.y);
+            }
+        }
+    }
+    /*    console.log("Ships were sent!");
+    pieces1=ships[0].getShip();
+    console.log("First ships length : "+pieces1.length);
+    for(var i=0;i<ships.length;i++)
+    {
+      var pieces: Piece[];
+      pieces=ships[i].getShip();
+      console.log("Ship "+i+" length : "+pieces.length);
+      for(var j=0;j<pieces.length;j++)
+        {
+          console.log("Ship "+i);
+          console.log(pieces[j].x+" "+pieces[j].y+" "+pieces[j].hit);
+        }
+    }*/
+    return res.status(200).json(ships);
+});
+app.route("/games").get((req, res, next) => {
+    return res.status(200).json(games);
+});
 app.get('/users/:mail', auth, (req, res, next) => {
     // req.params.mail contains the :mail URL component
     user.getModel().findOne({ mail: req.params.mail }, { digest: 0, salt: 0 }).then((user) => {
@@ -189,6 +295,7 @@ app.get('/renew', auth, (req, res, next) => {
 passport.use(new passportHTTP.BasicStrategy(function (username, password, done) {
     // Delegate function we provide to passport middleware
     // to verify user credentials 
+    console.log("New login attempt from ".green + io.id);
     console.log("New login attempt from ".green + username);
     user.getModel().findOne({ mail: username }, (err, user) => {
         if (err) {

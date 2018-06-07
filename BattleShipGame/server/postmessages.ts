@@ -25,6 +25,21 @@
  *     /users             -                  POST        Add a new user
  *     /login             -                  POST        login an existing user, returning a JWT
  * 
+ *     /create            -                  POST        create a game
+ * 
+ *     /games             -                  GET          returns all created games
+ * 
+ *     /join              -                  POST         join a game
+ * 
+ *     /status            -                  POST         send id and returns status of the created game
+ * 
+ *     /sendShips                             POST         send ships to one of the players
+ * 
+ *     /turn             -                    GET           Get turn
+ *    
+ *     /shoot             -                   GET 
+ * 
+ *     /shoot                                 POST         
  * 
  * ------------------------------------------------------------------------------------ 
  *  To install the required modules:
@@ -103,7 +118,11 @@ import io = require('socket.io');               // Socket.io websocket library
 
 //this is the logic of the game keeper
 import { Game } from './game';
-var game :Game;
+import { Socket } from 'net';
+import {Ship} from './ship';
+import { Piece } from './piece';
+
+var games : Game[] = new Array();
 
 var ios = undefined;
 
@@ -130,7 +149,7 @@ app.use( bodyparser.json() );
 
 app.get("/", (req,res) => {
 
-    res.status(200).json( { api_version: "1.0", endpoints: [ "/messages", "/users", "/login" ] } ); // json method sends a JSON response (setting the correct Content-Type) to the client
+    res.status(200).json( { api_version: "1.0", endpoints: [ "/messages", "/users", "/login", "/create", "/games", "/join", "/status"] } ); // json method sends a JSON response (setting the correct Content-Type) to the client
 
 });
 
@@ -174,6 +193,54 @@ app.route("/messages").get( auth, (req,res,next) => {
 
 });
 
+app.get('/turn' , (req,res,next) => { 
+  var id = req.query.id ;
+  for(var i=0;)
+
+
+});
+
+/*app.route("/shoot").get( auth, (req,res,next) => {
+
+  var filter = {};
+  console.log("Using filter: " + JSON.stringify(filter) );
+  console.log(" Using query: " + JSON.stringify(req.query) );
+
+  req.query.skip = parseInt( req.query.skip || "0" ) || 0;
+  req.query.limit = parseInt( req.query.limit || "20" ) || 20;
+
+  message.getModel().find( filter ).sort({timestamp:-1}).skip( req.query.skip ).limit( req.query.limit ).then( (documents) => {
+    return res.status(200).json( documents );
+  }).catch( (reason) => {
+    return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+  })
+
+}).post( auth, (req,res,next) => {
+
+  console.log("Received: " + JSON.stringify(req.body) );
+
+  var recvmessage = req.body;
+  recvmessage.timestamp = new Date();
+  recvmessage.authormail = req.user.mail;
+
+  if( message.isMessage( recvmessage ) ) {
+
+    message.getModel().create( recvmessage ).then( ( data ) => {
+      // Notify all socket.io clients
+      ios.emit('broadcast', data );
+
+      return res.status(200).json({ error: false, errormessage: "", id: data._id });
+    }).catch((reason) => {
+      return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+    } )
+
+  } else {
+    return next({ statusCode:404, error: true, errormessage: "Data is not a valid Message" });
+  }
+
+});*/
+
+
 app.delete( '/messages/:id', auth, (req,res,next) => {
 
   // Check moderator role
@@ -190,6 +257,7 @@ app.delete( '/messages/:id', auth, (req,res,next) => {
   })
 
 });
+
 
 
 app.get('/users', auth, (req,res,next) => {
@@ -218,6 +286,112 @@ app.post('/users', (req,res,next) => {
       return next({ statusCode:404, error: true, errormessage: "DB error: "+reason.errmsg });
     })
 
+});
+
+app.route("/create").post( (req,res,next) => {
+  var game : Game = new Game(req.body.id);
+  games.push(game);
+  console.log("ID of player one : "+game.idPlayerOne);
+  console.log("Array of games : "+games.length);
+  return res.status(200).json( game.idPlayerOne );
+});
+
+app.route("/join").post( (req,res,next) => {
+    console.log("attempt to join game");
+    var id1 : string = req.body.id1;
+    var id2 : string = req.body.id2;
+    console.log("The 2 ids: "+id1+" "+id2);
+    for(var i=0;i<games.length;i++)
+    {
+      if(games[i].idPlayerOne==id1)
+      {
+        console.log("True: "+id2);
+        games[i].joinSecondPlayer(id2);
+        console.log("Game joined-  player one : "+games[i].idPlayerOne);
+        console.log("Game joined-  player two : "+games[i].idPlayerTwo);
+      }
+    }
+    return res.status(200).json( id2 );
+});
+
+app.route("/status").post( (req,res,next) => {
+  console.log("check if "+req.body.id+" game is full");
+  var id : string = req.body.id;
+  var ok : boolean = false;
+  for(var i=0;i<games.length;i++)
+  {
+    if(games[i].idPlayerOne==id&&games[i].getFull())
+    {
+      console.log("Game will start!");
+      console.log("Full game -  player one : "+games[i].idPlayerOne);
+      console.log("Full game -  player two : "+games[i].idPlayerTwo);
+      games[i].createGameId();
+      console.log("Game ID: "+games[i].gameID);
+      console.log("Whose turn is it: "+games[i].turn);
+      ok=true;
+    }
+  }
+  console.log("Status "+ok);
+  return res.status(200).json(ok);
+});
+
+app.route("/sendShips").post( (req,res,next) => {
+  console.log("send to "+req.body.id);
+  var id : string = req.body.id;
+  var ships: Ship = req.body.ships;
+  console.log(JSON.stringify(req.body.ship));
+  var ship = JSON.parse(JSON.stringify(req.body.ship));
+  console.log(ship);
+  console.log(ship.Ship);
+  var pieceArray : Piece[] = ship.Ship;
+  var newShip : Ship = new Ship();
+  for(var i=0;i<pieceArray.length;i++)
+  {
+    var x : string = pieceArray[i].x;
+    var y : string = pieceArray[i].y;
+    newShip.add(x,y);
+    console.log("A piece: "+pieceArray[i].x+" : "+pieceArray[i].y);
+  }
+  console.log("Ship to be added : "+newShip.toString());
+  for(var i=0;i<games.length;i++)
+  {
+    if(games[i].getFull())
+    {
+      if(id==games[i].idPlayerOne)
+        {
+          games[i].addToPlayerOne(newShip);
+          console.log("Ship added to player one : "+newShip);
+          var p : Piece = newShip.getPiece(0);
+          console.log("First piece : "+p.x+" : "+p.y);
+        }
+      else if(id==games[i].idPlayerTwo)
+            {
+              games[i].addToPlayerTwo(newShip);
+              console.log("Ship added to player two : "+newShip);
+              var p : Piece = newShip.getPiece(0);
+              console.log("First piece : "+p.x+" : "+p.y);
+            }
+    }
+  }
+  /*    console.log("Ships were sent!");
+  pieces1=ships[0].getShip();
+  console.log("First ships length : "+pieces1.length);
+  for(var i=0;i<ships.length;i++)
+  {
+    var pieces: Piece[];
+    pieces=ships[i].getShip();
+    console.log("Ship "+i+" length : "+pieces.length);
+    for(var j=0;j<pieces.length;j++)
+      {
+        console.log("Ship "+i);
+        console.log(pieces[j].x+" "+pieces[j].y+" "+pieces[j].hit);
+      }
+  }*/
+  return res.status(200).json(ships);
+});
+
+app.route("/games").get((req,res,next) => {
+  return res.status(200).json( games );
 });
 
 app.get('/users/:mail', auth, (req,res,next) => {
@@ -252,6 +426,7 @@ passport.use( new passportHTTP.BasicStrategy(
     // Delegate function we provide to passport middleware
     // to verify user credentials 
 
+    console.log("New login attempt from ".green + io.id );
     console.log("New login attempt from ".green + username );
     user.getModel().findOne( {mail: username} , (err, user)=>{
       if( err ) {

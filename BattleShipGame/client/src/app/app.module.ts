@@ -42,13 +42,14 @@ declare var angular: any;
     BrowserModule,
     FormsModule,
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
   ],
   providers: [
     {provide: UserService, useClass: UserHttpService },
     {provide: SocketioService, useClass: SocketioService },
     {provide: MessageService, useClass: MessageHttpService /* Here we can select the specifc service instance */},
-    {provide: PositioningService, useClass: PositioningService}
+    {provide: PositioningService, useClass: PositioningService},
+    {provide: MessageHttpService, useClass: MessageHttpService}
   ],
   bootstrap: [AppComponent]
 })

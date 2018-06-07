@@ -1,19 +1,46 @@
-export class Game {
-    matrixPlayerOne: number[][];
-    matrixPlayerTwo: number[][];
+import {Ship} from './ship';
 
-    constructor() {
-        for(var i: number = 0; i < 10; i++) {
-            for(var j: number = 0; j< 10; j++) {
-                this.matrixPlayerOne[i][j] = 0;
-                this.matrixPlayerTwo[i][j] = 0;
-            }
+export class Game {
+
+    idPlayerOne: String;
+    idPlayerTwo: String;
+    full: boolean;
+    gameID: String;
+    turn: Number; // 1 first player , 2 second player
+    shipsOne: Ship[] = new Array();
+    shipsTwo: Ship[] = new Array();
+
+    constructor(id: String) {
+        this.idPlayerOne=id;
+        this.full=false;
+        console.log("Game created in server by: "+this.idPlayerOne.toString);
         }
-        //console.log(this.matrixPlayerOne , this.matrixPlayerTwo);
+    
+    joinSecondPlayer(id: String)
+    {
+        this.idPlayerTwo=id;
+        this.full=true;
+        console.log("Second player joined: "+this.idPlayerTwo.toString);
+        this.turn = Math.floor(Math.random() * 2) + 1;
     }
 
-    /*populateMatrixPlayerOne(ships: ship[]): void
+    getFull()
     {
+        return this.full;
+    }
 
-    }*/
+    createGameId()
+    {
+        if(this.full)
+        {
+            this.gameID=this.idPlayerOne+":"+this.idPlayerTwo;
+
+        }
+    }
+    addToPlayerOne(s : Ship): void {
+        this.shipsOne.push(s);
+    }
+    addToPlayerTwo(s : Ship): void {
+        this.shipsTwo.push(s);
+    }
 }

@@ -9,6 +9,7 @@ import {Message} from '../Message';
 import { UserService } from '../user.service';
 import { SocketioService } from '../socketio.service';
 import { Router } from '@angular/router';
+import { MessageHttpService } from '../message-http.service';
 
 @Component({
   selector: 'app-playing',
@@ -30,25 +31,12 @@ export class PlayingComponent implements OnInit {
 
   @Output() posted = new EventEmitter<Message>();
 
-  constructor(private router: Router, private ps: PositioningService, private ms: MessageService, private us: UserService, private sio: SocketioService ) { }
+  constructor(private router: Router, private ps: PositioningService, private mhs: MessageHttpService, private us: UserService, private sio: SocketioService ) { }
 
   ngOnInit() {
     this.ps.warning = null;
     this.populateTiles(this.tilesShooting);
     this.populateTiles(this.tilesPositioning);
-    this.set_empty();
-    setInterval(this.get_shots(), 1000);
-  }
-
-  set_empty() {
-    this.message = { content: '', timestamp: new Date(), authormail: '' };
-  }
-
-  get_shots() { //get messages every second
-    this.get_messages();
-    this.sio.connect().subscribe( (m) => {
-      this.get_messages();
-    });
   }
 
   populateTiles(tiles: Tile[]): void {
@@ -105,15 +93,8 @@ toggle(event) {
           }
       }
     }
-    //try to put X
-    console.log("Lovitura : "+this.recvmessage.content);
-    for(var i=0;i<children.length;i++)
-          {
-            if(children[i].getAttribute('id')==this.recvmessage.content)
-            {
-              (<HTMLElement>children[i]).innerHTML="X"; //pune X unde s-a pus ultima oara - > si sa nu mai puna si la ala care da
-            }
-          }
+   
+
     //code for shooting
     var board2 = document.querySelector("#gameboard-shooting");
     var children2 = board2.children;
@@ -139,7 +120,7 @@ toggle(event) {
             }
           }
       }             
-    this.post_message();   
+    //this.post_message();   
     console.log("Shots: "+this.alreadyShot);
   }
 
@@ -147,39 +128,5 @@ toggle(event) {
     return this.show;
   }
 
-  post_message( ) {
-    this.message.timestamp = new Date();
-    this.ms.post_message( this.message ).subscribe( (m) => {
-      console.log('Message posted');
-      this.set_empty();
-      this.posted.emit( m );
-    }, (error) => {
-      console.log('Error occurred while posting: ' + error);
-
-    });
-  }
-
-  public get_messages() {
-    this.ms.get_messages().subscribe(
-      ( messages ) => {
-        this.recvmessage = messages.shift();
-      } , (err) => {
-
-        // Try to renew the token
-        this.us.renew().subscribe( () => {
-          // Succeeded
-          this.get_messages();
-        }, (err2) => {
-          // Error again, we really need to logout
-          this.logout();
-        } );
-      }
-    );
-  }
-
-  logout() {
-    this.us.logout();
-    this.router.navigate(['/']);
-  }
 
 }

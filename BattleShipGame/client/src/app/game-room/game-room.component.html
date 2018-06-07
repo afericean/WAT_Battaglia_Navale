@@ -23,11 +23,37 @@
 
   <div  class="col-sm-6">
     <br> <br><br>
-    <div class="jumbotron"><h2> Search for game </h2>
-    <button type="button" (click)="go()">GO!</button></div> 
+    <div class="jumbotron">
+     <div><h4>Play game!</h4></div> 
+     <div>
+      <div *ngIf="create">
+          <button type="button" (click)="createGame()">Create game</button>
+      </div>
+      <div *ngIf = "wait">
+        Waiting for an opponent!
+        <div  class="loader"></div>
+        <button type="button" (click)="checkGame()">Check</button>
+      </div>
+      
+    </div>
+    <div *ngIf="create">
+    <button   type="button" (click)="get_games()">List games</button> 
+    <div *ngIf="availableGames">
+     <h3>There are no games available. Please create a game!</h3>
+    </div>
+    <div *ngIf="games.length">
+        <table *ngFor="let game of games"> 
+          <tr *ngIf="checkList(game)">
+            <td width="200px"><h5>{{game.idPlayerOne}}</h5></td>
+            <td><button type="button" (click)="join(game.idPlayerOne)">Join</button></td>
+          </tr> 
+        </table>
+       
+    </div> 
   </div>
-
-  <div class="col-sm-6" [ngStyle]="{'margin-top': '50px'}" ><app-message-list></app-message-list>
+  </div>
+</div>
+  <div class="col-sm-6" [ngStyle]="{'margin-top': '50px'}" >  <br> <br><br> <app-message-list></app-message-list>
   </div>  
 
 </div>

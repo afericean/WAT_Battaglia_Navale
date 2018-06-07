@@ -5,6 +5,7 @@ import { Ship } from '../ship';
 import { Piece } from '../piece';
 import { PositioningService } from '../positioning.service';
 import { Router } from '@angular/router';
+import { MessageHttpService } from '../message-http.service';
 
 @Component({
   selector: 'app-gameboard-positioning',
@@ -13,7 +14,7 @@ import { Router } from '@angular/router';
 })
 export class GameboardPositioningComponent implements OnInit {
   tiles: Tile[] = new Array();
-  constructor(private ps : PositioningService, private router: Router) {}
+  constructor(private ps : PositioningService, private router: Router,private mhs: MessageHttpService) {}
 
   ngOnInit() {
     this.populateTiles();
@@ -199,6 +200,16 @@ continue(): boolean
     return false;
 }
 
+sendShip(s : Ship)
+{
+  console.log("Sending ships : ");
+    this.mhs.send_ship(s).subscribe( () => {
+      console.log('Ships sent');
+    }, (error) => {
+      console.log('Error occurred while sending ships: ' + error);
+    });
+}
+
 info(): boolean{
   if(this.ps.info)
     {console.log("Continue");
@@ -208,7 +219,11 @@ info(): boolean{
 }
 
 play(){
-  this.router.navigate(['playing']);
+  for(var i=0;i<this.ps.Ships.length;i++)
+  {
+    this.sendShip(this.ps.Ships[i]);
+  }
+  this.router.navigate(['/playing']);
 }
 
 }
