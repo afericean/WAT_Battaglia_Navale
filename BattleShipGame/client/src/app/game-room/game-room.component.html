@@ -32,12 +32,12 @@
       <div *ngIf = "wait">
         Waiting for an opponent!
         <div  class="loader"></div>
-        <button type="button" (click)="checkGame()">Check</button>
+        <!--<button type="button" (click)="checkGame()">Check</button>-->
       </div>
       
     </div>
     <div *ngIf="create">
-    <button   type="button" (click)="get_games()">List games</button> 
+    <button   type="button" (click)="gamesList()">List games</button> 
     <div *ngIf="availableGames">
      <h3>There are no games available. Please create a game!</h3>
     </div>
@@ -53,7 +53,7 @@
   </div>
   </div>
 </div>
-  <div class="col-sm-6" [ngStyle]="{'margin-top': '50px'}" >  <br> <br><br> <app-message-list></app-message-list>
+  <div class="col-sm-6" [ngStyle]="{'margin-top': '10px'}" >  <br> <br><br> <app-message-list></app-message-list>
   </div>  
 
 </div>

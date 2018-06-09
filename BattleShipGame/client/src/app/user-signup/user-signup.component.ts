@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 export class UserSignupComponent implements OnInit {
 
   private errmessage = undefined;
-  private user = { mail: '', password: '', username: '', roles: [], points: 0, win: 0, lost: 0};
+  private user = { mail: '', password: '', username: '', roles: ["MODERATOR"], points: 0, win: 0, lost: 0};
 
   constructor( private us: UserService, private router: Router ) { }
 

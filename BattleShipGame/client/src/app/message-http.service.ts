@@ -7,6 +7,8 @@ import { of } from 'rxjs/observable/of';
 import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { UserService } from './user.service';
 import { Ship } from './ship';
+import { PositioningService } from './positioning.service';
+import {PrivateMessage} from './privateMessage';
 
 
 
@@ -15,7 +17,7 @@ export class MessageHttpService {
 
   private messages = [];
 
-  constructor( private http: HttpClient, private us: UserService ) {
+  constructor( private http: HttpClient, private us: UserService, private ps: PositioningService ) {
     console.log('Message service instantiated');
     console.log('User service token: ' + us.get_token() );
    }
@@ -56,6 +58,13 @@ export class MessageHttpService {
       );
   }
 
+  get_users(): Observable<any> {
+    return this.http.get<any>( this.us.url + '/users'/*, this.create_options( {limit: '10', skip: '0'} )*/ ).pipe(
+      tap( (data) => console.log(JSON.stringify(data))) ,
+      catchError( this.handleError )
+    );
+  }
+
   post_message( m: Message ): Observable<Message> {
     console.log('Posting ' + JSON.stringify(m) );
     return this.http.post<Message>( this.us.url + '/messages', m,  this.create_options() ).pipe(
@@ -68,6 +77,51 @@ export class MessageHttpService {
         tap( (data) => console.log("turn "+ JSON.stringify(data))) ,
         catchError( this.handleError )
       );
+  }
+
+  get_shot(pos : string): Observable<any> {
+    return this.http.get<any>( this.us.url + '/shoot', this.create_options({id: this.us.get_username(), position: pos}) ).pipe(
+        tap( (data) => console.log("turn "+ JSON.stringify(data))) ,
+        catchError( this.handleError )
+      );
+  }
+
+  send_message(message : string): Observable<any>
+  {
+    console.log('Sending private message ' + this.us.get_username() );
+    var id : string = this.us.get_username();
+    var gameid : string = this.ps.gameId;
+    console.log("Sending private message: "+id+" "+message);
+    return this.http.post<any>( this.us.url + '/private',{"gameid":gameid,"id":id,"message":message}).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  get_private_messages(): Observable<PrivateMessage[]>
+  {
+    var gameid : string = this.ps.gameId;
+    return this.http.get<PrivateMessage[]>( this.us.url + '/prvmsg', this.create_options( {"gameid": gameid} ) ).pipe(
+
+      catchError( this.handleError )
+    );
+  }
+
+  get_X(): Observable<string>
+  {
+    var gameid : string = this.ps.gameId;
+    var id : string = this.us.get_username();
+    return this.http.get<string>( this.us.url + '/getX', this.create_options( {"gameid": gameid,"id":id} ) ).pipe(
+      catchError( this.handleError )
+    );
+  }
+
+  get_victory(): Observable<any>
+  {
+    var gameid : string = this.ps.gameId;
+    var id : string = this.us.get_username();
+    return this.http.get<any>( this.us.url + '/victory', this.create_options( {"gameid": gameid,"id":id} ) ).pipe(
+      catchError( this.handleError )
+    );
   }
 
   create_game(): Observable<any> {

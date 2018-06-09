@@ -5,6 +5,7 @@ import { UserService } from '../user.service';
 import { Router } from '@angular/router';
 import { SocketioService } from '../socketio.service';
 
+
 @Component({
   selector: 'app-message-list',
   templateUrl: './message-list.component.html',
@@ -18,7 +19,8 @@ export class MessageListComponent implements OnInit {
 
   ngOnInit() {
     this.get_messages();
-    this.sio.connect().subscribe( (m) => {
+    this.sio.connect('broadcast').subscribe( (m) => {
+      console.log("The message received from socket: "+<Message>m);
       this.get_messages();
     });
   }

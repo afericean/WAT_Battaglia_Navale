@@ -11,6 +11,8 @@ export class PositioningService {
   undoArray: any[] = new Array();
   selectedColor: string = null;
   info: boolean = true;
+  player: number; //this is so the player knows his turn
+  gameId: string;
   constructor() { }
 
 }

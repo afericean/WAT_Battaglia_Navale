@@ -34,8 +34,19 @@
  *
  *     /status            -                  POST         send id and returns status of the created game
  *
- *     /sendShips                             POST         send ships to one of the players
+ *     /sendShips                            POST         send ships to one of the players
  *
+ *     /turn              -                  GET          Get turn
+ *
+ *     /shoot             -                  GET          Get shot
+ *
+ *     /private           -                  POST         Send private message
+ *
+ *     /prvmsg            -                  GET          Get the private messages
+ *
+ *     /getX              -                  GET          Get the hit
+ *
+ *     /victory           -                  GET
  * ------------------------------------------------------------------------------------
  *  To install the required modules:
  *  $ npm install
@@ -100,6 +111,7 @@ const io = require("socket.io"); // Socket.io websocket library
 //this is the logic of the game keeper
 const game_1 = require("./game");
 const ship_1 = require("./ship");
+const privateMessage_1 = require("./privateMessage");
 var games = new Array();
 var ios = undefined;
 var app = express();
@@ -117,7 +129,7 @@ app.use(bodyparser.json());
 // Add API routes to express application
 //
 app.get("/", (req, res) => {
-    res.status(200).json({ api_version: "1.0", endpoints: ["/messages", "/users", "/login", "/create", "/games", "/join", "/status"] }); // json method sends a JSON response (setting the correct Content-Type) to the client
+    res.status(200).json({ api_version: "1.0", endpoints: ["/messages", "/users", "/login", "/create", "/games", "/join", "/status", "/turn"] }); // json method sends a JSON response (setting the correct Content-Type) to the client
 });
 app.route("/messages").get(auth, (req, res, next) => {
     var filter = {};
@@ -147,6 +159,184 @@ app.route("/messages").get(auth, (req, res, next) => {
     else {
         return next({ statusCode: 404, error: true, errormessage: "Data is not a valid Message" });
     }
+});
+app.get('/turn', (req, res, next) => {
+    //console.log("Query: "+JSON.stringify(req.query.id));
+    var id = JSON.parse(JSON.stringify(req.query.id));
+    //console.log("ID from query : "+ id);
+    var turn = null;
+    for (var i = 0; i < games.length; i++) {
+        if (games[i].idPlayerOne == id && games[i].getFull()) {
+            turn = games[i].turn;
+        }
+        else if (games[i].idPlayerTwo == id && games[i].getFull()) {
+            turn = games[i].turn;
+        }
+    }
+    console.log("Turn from turn endpoint " + turn);
+    return res.status(200).json(turn);
+});
+app.get('/shoot', (req, res, next) => {
+    console.log("Query: " + JSON.stringify(req.query.id));
+    var id = JSON.parse(JSON.stringify(req.query.id));
+    var ok = false;
+    console.log("ID from query : " + id);
+    var position = req.query.position;
+    console.log("Position to shoot : " + position);
+    var fullShip = new Array();
+    var turn = true;
+    for (var i = 0; i < games.length; i++) {
+        if (games[i].idPlayerOne == id && games[i].getFull()) {
+            if (games[i].turn == 2) {
+                turn = false;
+                break;
+            }
+            var ships = games[i].shipsTwo; //put ships of player two
+            console.log("Length of ships sent : " + ships.length);
+            for (var k = 0; k < ships.length; k++) {
+                var currentShip = ships[k].getShip();
+                console.log("Length of ship " + k + " : " + currentShip.length);
+                for (var j = 0; j < currentShip.length; j++) {
+                    if (currentShip[j].y == position[0] && currentShip[j].x == position[1]) {
+                        ok = true;
+                        currentShip[j].hit = true;
+                        var hitArr = new Array();
+                        var check = true;
+                        for (var w = 0; w < currentShip.length; w++) {
+                            var s;
+                            s = currentShip[w].y + currentShip[w].x;
+                            hitArr.push(s);
+                            if (currentShip[w].hit == false) {
+                                check = false;
+                            }
+                        }
+                        if (check) {
+                            fullShip = hitArr;
+                        }
+                    }
+                }
+            }
+            games[i].xTwo = position;
+            console.log("The X of player2 " + id + " " + games[i].xTwo);
+            games[i].changeTurn();
+            console.log("Turn after changing turn " + games[i].turn);
+        }
+        else if (games[i].idPlayerTwo == id && games[i].getFull()) {
+            if (games[i].turn == 1) {
+                turn = false;
+                break;
+            }
+            var ships = games[i].shipsOne; //put ships of player two
+            console.log("Length of ships sent : " + ships.length);
+            for (var k = 0; k < ships.length; k++) {
+                var currentShip = ships[k].getShip();
+                console.log("Length of ship " + k + " : " + currentShip.length);
+                for (var j = 0; j < currentShip.length; j++) {
+                    if (currentShip[j].y == position[0] && currentShip[j].x == position[1]) {
+                        ok = true;
+                        currentShip[j].hit = true;
+                        var hitArr = new Array(); //check if all ship was hit
+                        var check = true;
+                        for (var w = 0; w < currentShip.length; w++) {
+                            var s;
+                            s = currentShip[w].y + currentShip[w].x;
+                            hitArr.push(s);
+                            if (currentShip[w].hit == false) {
+                                check = false;
+                            }
+                        }
+                        if (check) {
+                            fullShip = hitArr;
+                        }
+                    }
+                }
+            }
+            games[i].xOne = position;
+            console.log("The X of player1 " + id + " " + games[i].xOne);
+            games[i].changeTurn();
+            console.log("Turn after changing turn " + games[i].turn);
+        }
+    }
+    console.log("To be sent after shot : " + JSON.stringify({ "ok": ok, "arr": fullShip }));
+    return res.status(200).json({ "turn": turn, "ok": ok, "arr": fullShip });
+});
+app.get('/victory', (req, res, next) => {
+    console.log("Query: " + JSON.stringify(req.query));
+    var id = req.query.id;
+    var gameid = req.query.gameid;
+    var won = true;
+    var lost = true;
+    for (var i = 0; i < games.length; i++) {
+        if (games[i].gameID == gameid && games[i].getFull()) {
+            if (games[i].idPlayerOne == id) {
+                var ships = games[i].shipsTwo; //check opponent ships
+                for (var k = 0; k < ships.length; k++) {
+                    var currentShip = ships[k].getShip();
+                    console.log("Length of ship " + k + " : " + currentShip.length);
+                    for (var j = 0; j < currentShip.length; j++) {
+                        if (currentShip[j].hit == false) {
+                            won = false;
+                            break;
+                        }
+                    }
+                }
+                var ships2 = games[i].shipsOne; //check my ships
+                for (var k = 0; k < ships2.length; k++) {
+                    var currentShip = ships2[k].getShip();
+                    console.log("Length of ship " + k + " : " + currentShip.length);
+                    for (var j = 0; j < currentShip.length; j++) {
+                        if (currentShip[j].hit == false) {
+                            lost = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (games[i].idPlayerTwo == id) {
+                var ships = games[i].shipsOne; //check ships of player two
+                for (var k = 0; k < ships.length; k++) {
+                    var currentShip = ships[k].getShip();
+                    console.log("Length of ship " + k + " : " + currentShip.length);
+                    for (var j = 0; j < currentShip.length; j++) {
+                        if (currentShip[j].hit == false) {
+                            won = false;
+                            break;
+                        }
+                    }
+                }
+                var ships2 = games[i].shipsTwo; //check my ships
+                for (var k = 0; k < ships2.length; k++) {
+                    var currentShip = ships2[k].getShip();
+                    console.log("Length of ship " + k + " : " + currentShip.length);
+                    for (var j = 0; j < currentShip.length; j++) {
+                        if (currentShip[j].hit == false) {
+                            lost = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // req.params.mail contains the :mail URL component
+    user.getModel().findOne({ username: id }, { digest: 0, salt: 0 }).then((user) => {
+        console.log("Updating user " + id);
+        if (won && lost == false) {
+            user.points += 2;
+            user.win += 1;
+        }
+        else if (won == false && lost) {
+            user.points -= 1;
+            user.lost += 1;
+        }
+        else if (won && lost) {
+            user.points -= 1;
+            user.lost += 1;
+        }
+        user.save();
+    });
+    console.log("To be sent after shot : " + JSON.stringify({ "won": won, "lost": lost }));
+    return res.status(200).json({ "won": won, "lost": lost });
 });
 app.delete('/messages/:id', auth, (req, res, next) => {
     // Check moderator role
@@ -184,94 +374,135 @@ app.post('/users', (req, res, next) => {
 app.route("/create").post((req, res, next) => {
     var game = new game_1.Game(req.body.id);
     games.push(game);
-    console.log("ID of player one : " + game.idPlayerOne);
-    console.log("Array of games : " + games.length);
+    //console.log("ID of player one : "+game.idPlayerOne);
+    //console.log("Array of games : "+games.length);
     return res.status(200).json(game.idPlayerOne);
 });
 app.route("/join").post((req, res, next) => {
-    console.log("attempt to join game");
+    //console.log("attempt to join game");
     var id1 = req.body.id1;
     var id2 = req.body.id2;
-    console.log("The 2 ids: " + id1 + " " + id2);
+    var gameId;
+    //console.log("The 2 ids: "+id1+" "+id2);
     for (var i = 0; i < games.length; i++) {
         if (games[i].idPlayerOne == id1) {
-            console.log("True: " + id2);
+            //console.log("True: "+id2);
             games[i].joinSecondPlayer(id2);
-            console.log("Game joined-  player one : " + games[i].idPlayerOne);
-            console.log("Game joined-  player two : " + games[i].idPlayerTwo);
+            // console.log("Game joined-  player one : "+games[i].idPlayerOne);
+            // console.log("Game joined-  player two : "+games[i].idPlayerTwo);
+            //console.log("Game is full :"+games[i].getFull());
+            games[i].createGameId();
+            gameId = games[i].gameID;
+            // console.log("Game ID :"+gameId);
         }
     }
-    return res.status(200).json(id2);
+    return res.status(200).json(gameId);
 });
 app.route("/status").post((req, res, next) => {
-    console.log("check if " + req.body.id + " game is full");
+    //console.log("check if "+req.body.id+" game is full");
     var id = req.body.id;
     var ok = false;
+    var gameId;
     for (var i = 0; i < games.length; i++) {
         if (games[i].idPlayerOne == id && games[i].getFull()) {
-            console.log("Game will start!");
-            console.log("Full game -  player one : " + games[i].idPlayerOne);
-            console.log("Full game -  player two : " + games[i].idPlayerTwo);
-            games[i].createGameId();
-            console.log("Game ID: " + games[i].gameID);
-            console.log("Whose turn is it: " + games[i].turn);
+            //console.log("Game will start!");
+            //console.log("Full game -  player one : "+games[i].idPlayerOne);
+            //console.log("Full game -  player two : "+games[i].idPlayerTwo);
+            //console.log("Game ID: "+games[i].gameID);
+            gameId = games[i].gameID;
+            //console.log("Whose turn is it: "+games[i].turn);
             ok = true;
         }
     }
-    console.log("Status " + ok);
-    return res.status(200).json(ok);
+    // console.log("Status "+ok);
+    return res.status(200).json({ status: ok, id: gameId });
 });
 app.route("/sendShips").post((req, res, next) => {
-    console.log("send to " + req.body.id);
+    //console.log("send to "+req.body.id);
     var id = req.body.id;
-    var ships = req.body.ships;
-    console.log(JSON.stringify(req.body.ship));
+    //console.log(JSON.stringify(req.body.ship));
     var ship = JSON.parse(JSON.stringify(req.body.ship));
-    console.log(ship);
-    console.log(ship.Ship);
+    //console.log(ship);
+    //console.log(ship.Ship);
     var pieceArray = ship.Ship;
     var newShip = new ship_1.Ship();
     for (var i = 0; i < pieceArray.length; i++) {
         var x = pieceArray[i].x;
         var y = pieceArray[i].y;
         newShip.add(x, y);
-        console.log("A piece: " + pieceArray[i].x + " : " + pieceArray[i].y);
+        //console.log("A piece: "+pieceArray[i].x+" : "+pieceArray[i].y);
     }
-    console.log("Ship to be added : " + newShip.toString());
+    // console.log("Ship to be added : "+newShip.toString());
     for (var i = 0; i < games.length; i++) {
-        if (games[i].getFull()) {
+        if (games[i].full) {
             if (id == games[i].idPlayerOne) {
                 games[i].addToPlayerOne(newShip);
-                console.log("Ship added to player one : " + newShip);
+                //console.log("Ship added to player one : "+newShip);
                 var p = newShip.getPiece(0);
-                console.log("First piece : " + p.x + " : " + p.y);
+                //console.log("First piece : "+p.x+" : "+p.y);
             }
             else if (id == games[i].idPlayerTwo) {
                 games[i].addToPlayerTwo(newShip);
-                console.log("Ship added to player two : " + newShip);
+                //console.log("Ship added to player two : "+newShip);
                 var p = newShip.getPiece(0);
-                console.log("First piece : " + p.x + " : " + p.y);
+                // console.log("First piece : "+p.x+" : "+p.y);
             }
         }
     }
-    /*    console.log("Ships were sent!");
-    pieces1=ships[0].getShip();
-    console.log("First ships length : "+pieces1.length);
-    for(var i=0;i<ships.length;i++)
-    {
-      var pieces: Piece[];
-      pieces=ships[i].getShip();
-      console.log("Ship "+i+" length : "+pieces.length);
-      for(var j=0;j<pieces.length;j++)
-        {
-          console.log("Ship "+i);
-          console.log(pieces[j].x+" "+pieces[j].y+" "+pieces[j].hit);
+    return res.status(200).json(ship);
+});
+app.get('/prvmsg', (req, res, next) => {
+    //console.log("Query: "+JSON.stringify(req.query));
+    var gameid = req.query.gameid;
+    var msgArr;
+    for (var i = 0; i < games.length; i++) {
+        if (games[i].gameID == gameid && games[i].getFull()) {
+            msgArr = games[i].getPrivateMsgArr();
         }
-    }*/
-    return res.status(200).json(ships);
+    }
+    //console.log("The array of messages "+msgArr);
+    return res.status(200).json(msgArr);
+});
+app.get('/getX', (req, res, next) => {
+    console.log("Query: " + JSON.stringify(req.query));
+    var gameid = req.query.gameid;
+    var id = req.query.id;
+    var hit;
+    for (var i = 0; i < games.length; i++) {
+        if (games[i].gameID == gameid && games[i].getFull()) {
+            console.log("Found the game : " + games[i].gameID);
+            if (games[i].idPlayerOne == id) {
+                hit = games[i].xOne;
+                console.log("Returning for player1 : " + hit);
+            }
+            else if (games[i].idPlayerTwo == id) {
+                hit = games[i].xTwo;
+                console.log("Returning for player2 : " + hit);
+            }
+        }
+    }
+    console.log("Hit at position: " + hit);
+    return res.status(200).json(hit);
 });
 app.route("/games").get((req, res, next) => {
     return res.status(200).json(games);
+});
+app.route("/private").post((req, res, next) => {
+    // console.log("Received "+JSON.stringify(req.body));
+    var id = req.body.id;
+    var gameId = req.body.gameid;
+    var content = req.body.message;
+    var prvMsg = new privateMessage_1.PrivateMessage(id, content);
+    var k = 0;
+    for (var i = 0; i < games.length; i++) {
+        if (games[i].gameID == gameId && games[i].getFull()) {
+            games[i].addMessage(prvMsg);
+            //console.log("Message pushed");
+            k = i;
+        }
+    }
+    //console.log("Array of messages : "+games[k].getPrivateMsgArr());
+    return res.status(200).json(games[k].getPrivateMsgArr());
 });
 app.get('/users/:mail', auth, (req, res, next) => {
     // req.params.mail contains the :mail URL component

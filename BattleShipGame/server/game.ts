@@ -1,14 +1,18 @@
 import {Ship} from './ship';
+import {PrivateMessage} from './privateMessage';
 
 export class Game {
 
     idPlayerOne: String;
     idPlayerTwo: String;
     full: boolean;
-    gameID: String;
+    gameID: string;
     turn: Number; // 1 first player , 2 second player
     shipsOne: Ship[] = new Array();
     shipsTwo: Ship[] = new Array();
+    privateMsgArray: PrivateMessage[] = new Array();
+    xOne: string;
+    xTwo: string;
 
     constructor(id: String) {
         this.idPlayerOne=id;
@@ -16,6 +20,16 @@ export class Game {
         console.log("Game created in server by: "+this.idPlayerOne.toString);
         }
     
+    addMessage(m: PrivateMessage)
+    {
+        this.privateMsgArray.push(m);
+    }
+
+    getPrivateMsgArr()
+    {
+        return this.privateMsgArray;
+    }
+
     joinSecondPlayer(id: String)
     {
         this.idPlayerTwo=id;
@@ -42,5 +56,16 @@ export class Game {
     }
     addToPlayerTwo(s : Ship): void {
         this.shipsTwo.push(s);
+    }
+    changeTurn()
+    {
+        if(this.turn==1)
+        {
+            this.turn = 2;
+        }
+        else if(this.turn==2)
+                {
+                    this.turn = 1;
+                }
     }
 }

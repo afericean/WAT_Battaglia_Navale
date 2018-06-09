@@ -4,9 +4,16 @@ class Game {
     constructor(id) {
         this.shipsOne = new Array();
         this.shipsTwo = new Array();
+        this.privateMsgArray = new Array();
         this.idPlayerOne = id;
         this.full = false;
         console.log("Game created in server by: " + this.idPlayerOne.toString);
+    }
+    addMessage(m) {
+        this.privateMsgArray.push(m);
+    }
+    getPrivateMsgArr() {
+        return this.privateMsgArray;
     }
     joinSecondPlayer(id) {
         this.idPlayerTwo = id;
@@ -27,6 +34,14 @@ class Game {
     }
     addToPlayerTwo(s) {
         this.shipsTwo.push(s);
+    }
+    changeTurn() {
+        if (this.turn == 1) {
+            this.turn = 2;
+        }
+        else if (this.turn == 2) {
+            this.turn = 1;
+        }
     }
 }
 exports.Game = Game;

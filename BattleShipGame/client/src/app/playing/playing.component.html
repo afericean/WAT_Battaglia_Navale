@@ -1,19 +1,52 @@
 <div class="row">
-        <div class="col-xs-6">   
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">   
                 <h4 id="h4">Oponnent Board</h4>
                 <div id="gameboard-shooting" >
                         <div *ngFor="let tile of tilesShooting" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}"  (click)="toggle($event)">   
                         </div>    
                 </div>
-        <div *ngIf="ps.warning"  [ngStyle]="{'color':'red', 'top': '520px'}"  ><b>{{ps.warning}}</b></div>  
+                <div class="container" id="oppb">
+                        <div *ngIf="ps.warning"  [ngStyle]="{'color':'red'}"  ><b>{{ps.warning}}</b></div> 
+                        <div *ngIf="checkTurn()">It is my turn!</div>
+                        <div *ngIf="checkTurn()==false">It is my opponent's turn!</div>
+                        <div *ngIf="finish" [ngStyle]="{'color':'green'}" ><h2>{{finish}}</h2></div>
+                </div>
         </div>
+       <!-- <div class="col-sm-1 col-md-1 col-lg-1"> <br><br><br><br><br> </div> -->
 
-        <div class="col-sm-6">
+        <div class="col-xs-6 col-sm-7 col-md-7 col-lg-6" id="myb">
                 <h4 id="h4">My Board</h4>
                 <div id="gameboard" >
                         <div *ngFor="let tile of tilesPositioning" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}">   
                         </div>       
-                        <button *ngIf="buttonShow()" [ngStyle]="{'position':'absolute', 'top': '520px'}" (click)="toggle($event)">Show my boats!</button>  
+                        
+                </div>
+
+                <div class="container" id="buttons">
+                         <button *ngIf="buttonShow()" id="boat" [ngStyle]="{'top': '350px','left': '10%'}"  (click)="toggle($event)">Show my boats!</button> 
+                </div>
+        </div>
+
+
+</div>
+
+
+<div class="container" id="prv">
+                <h5>Chat</h5>
+                <div class="card">
+                        <!--<label for="messagetext">Message</label>-->
+                        <textarea class="form-control" [(ngModel)]="privateMessage" #messagetx id="messagetext" 
+                        rows="3" (keyup.enter)="send_message()" placeholder="Enter your message here"></textarea>
+                        <button type="submit" class="btn btn-primary" (click)="send_message()" >Send <i class="fas fa-paper-plane"></i></button>
+                        <div class="container" *ngIf="prvMsgArr.length">
+                                <table *ngFor="let msg of prvMsgArr"> 
+                                <tr>
+                                <td width="200px"><h5>{{msg.id}}</h5></td>
+                                <td>{{msg.content}}</td>
+                                </tr> 
+                                </table>   
                 </div>
         </div>
 </div>
+
+

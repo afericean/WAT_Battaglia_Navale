@@ -193,7 +193,7 @@ return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
 
 continue(): boolean
 {
-  if(this.ps.Ships.length >= 1)
+  if(this.ps.Ships.length == 9)
     {console.log("Continue");
       return true;
     } else

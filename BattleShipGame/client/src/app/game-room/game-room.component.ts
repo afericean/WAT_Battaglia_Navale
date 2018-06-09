@@ -3,6 +3,7 @@ import { UserService } from '../user.service';
 import { Router } from '@angular/router';
 import { MessageHttpService } from '../message-http.service';
 import { Game } from '../game';
+import { PositioningService } from '../positioning.service';
 
 @Component({
   selector: 'app-game-room',
@@ -16,8 +17,11 @@ export class GameRoomComponent implements OnInit {
   private create: boolean = true;
   //private status: boolean = false;
   private games: Game[] = new Array();
+  private start: boolean = false;
+  private intervalID;
+  private intervalID2;
 
-  constructor(private us: UserService, private router: Router, private mhs: MessageHttpService) { }
+  constructor(private us: UserService, private router: Router, private mhs: MessageHttpService, private ps:PositioningService) { }
 
   ngOnInit() {
   }
@@ -34,12 +38,14 @@ export class GameRoomComponent implements OnInit {
   createGame() {
     this.wait = true;
     this.create = false;
+    this.ps.player = 1;
+    console.log(this.us.get_username()+" is player"+this.ps.player);
     this.mhs.create_game().subscribe( () => {
       console.log('Game created');
     }, (error) => {
       console.log('Error occurred while creating game: ' + error);
     });
-    
+    this.intervalID = setInterval(this.checkGame.bind(this), 2000); //check if someone joins the game
   }
   
   checkList(g : Game): boolean
@@ -47,6 +53,11 @@ export class GameRoomComponent implements OnInit {
     if(g.full)
       return false;
     return true;
+  }
+
+  gamesList(){
+    this.get_games();
+    this.intervalID2 = setInterval(this.get_games.bind(this), 2000);
   }
 
   get_games() {
@@ -89,20 +100,33 @@ export class GameRoomComponent implements OnInit {
 
   join(s: string){
     console.log("Join : "+s);
-    this.mhs.join_game(s).subscribe( (s) => {
+    this.ps.player = 2;
+    console.log(this.us.get_username()+" is player"+this.ps.player);
+    this.mhs.join_game(s).subscribe( ( gameId ) => {
+      this.ps.gameId = gameId;
       console.log('Game joined');
+      console.log('Game id : '+this.ps.gameId);
     }, (error) => {
       console.log('Error occurred while creating game: ' + error);
     });
+    if (this.intervalID2) {
+      clearInterval(this.intervalID2);
+    }
     this.router.navigate(['/positioning'])
   }
 
   checkGame(){
     console.log("Checking game status : ");
-    this.mhs.check_game().subscribe( (status) => {
-      console.log("status primit:"+status);
-      if(status==true)
-        this.router.navigate(['/positioning']);
+    this.mhs.check_game().subscribe( (response) => {
+      console.log("status primit:"+response.status);
+      if(response.status==true)
+        {this.start = response.status;
+          if (this.intervalID) {
+            clearInterval(this.intervalID);
+          }
+          this.router.navigate(['/positioning']);}
+      this.ps.gameId = response.id;
+      console.log("Game Id : "+this.ps.gameId);
       console.log('Game checked');
     }, (error) => {
       console.log('Error occurred while checking game: ' + error);
