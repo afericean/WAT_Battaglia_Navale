@@ -54,6 +54,15 @@ export class PlayingComponent implements OnInit {
   }
 
   public go_to_game_room(){
+    if (this.intervalID) {
+      clearInterval(this.intervalID);
+    }
+    if (this.intervalID2) {
+      clearInterval(this.intervalID2);
+    }
+    if (this.intervalID3) {
+      clearInterval(this.intervalID3);
+    }
     this.router.navigate(['/game-room']);
   }
 

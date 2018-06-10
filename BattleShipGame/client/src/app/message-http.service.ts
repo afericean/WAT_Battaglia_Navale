@@ -124,6 +124,30 @@ export class MessageHttpService {
     );
   }
 
+  send_continue(): Observable<any>
+  {
+    var gameid : string = this.ps.gameId;
+    var id : string = this.us.get_username();
+    return this.http.get<any>( this.us.url + '/continue', this.create_options( {"gameid": gameid,"id":id} ) ).pipe(
+      catchError( this.handleError )
+    );
+  }
+
+  get_start(): Observable<any>
+  {
+    var gameid : string = this.ps.gameId;
+    return this.http.get<any>( this.us.url + '/start', this.create_options( {"gameid": gameid} ) ).pipe(
+      catchError( this.handleError )
+    );
+  }
+
+  remove_finished(): Observable<any>
+  {
+    return this.http.get<any>( this.us.url + '/remove' ).pipe(
+      catchError( this.handleError )
+    );
+  }
+
   create_game(): Observable<any> {
     console.log('Creating game ' + this.us.get_username() );
     var id : string = this.us.get_username();

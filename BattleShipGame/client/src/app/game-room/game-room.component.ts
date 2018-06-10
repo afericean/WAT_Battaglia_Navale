@@ -20,19 +20,36 @@ export class GameRoomComponent implements OnInit {
   private start: boolean = false;
   private intervalID;
   private intervalID2;
+  private intervalID3;
 
   constructor(private us: UserService, private router: Router, private mhs: MessageHttpService, private ps:PositioningService) { }
 
   ngOnInit() {
+    this.intervalID3 = setInterval(this.remove_finished.bind(this), 10000); //check if there are games finished to remove
   }
 
   logout() {
     this.us.logout();
+    this.stop_intervals();
     this.router.navigate(['/']);
   }
 
   profile(){
-  this.router.navigate(['/profile']);
+    this.stop_intervals();
+    this.router.navigate(['/profile']);
+  }
+
+  stop_intervals()
+  {
+    if (this.intervalID) {
+      clearInterval(this.intervalID);
+    }
+    if (this.intervalID2) {
+      clearInterval(this.intervalID2);
+    }
+    if (this.intervalID3) {
+      clearInterval(this.intervalID3);
+    }
   }
 
   createGame() {
@@ -109,10 +126,18 @@ export class GameRoomComponent implements OnInit {
     }, (error) => {
       console.log('Error occurred while creating game: ' + error);
     });
-    if (this.intervalID2) {
-      clearInterval(this.intervalID2);
-    }
+    this.stop_intervals();
     this.router.navigate(['/positioning'])
+  }
+
+  remove_finished()
+  {
+    console.log("Checking to remove");
+    this.mhs.remove_finished().subscribe( (game) => {
+      console.log('Removed game : '+game);
+    }, (error) => {
+      console.log('Error occurred while removing finished games: ' + error);
+    });
   }
 
   checkGame(){
@@ -121,9 +146,7 @@ export class GameRoomComponent implements OnInit {
       console.log("status primit:"+response.status);
       if(response.status==true)
         {this.start = response.status;
-          if (this.intervalID) {
-            clearInterval(this.intervalID);
-          }
+          this.stop_intervals();
           this.router.navigate(['/positioning']);}
       this.ps.gameId = response.id;
       console.log("Game Id : "+this.ps.gameId);

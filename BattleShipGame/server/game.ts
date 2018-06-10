@@ -13,10 +13,16 @@ export class Game {
     privateMsgArray: PrivateMessage[] = new Array();
     xOne: string;
     xTwo: string;
+    readyPlayerOne: boolean;
+    readyPlayerTwo: boolean;
+    finished: boolean;
 
     constructor(id: String) {
         this.idPlayerOne=id;
         this.full=false;
+        this.readyPlayerOne = false;
+        this.readyPlayerTwo = false;
+        this.finished = false;
         console.log("Game created in server by: "+this.idPlayerOne.toString);
         }
     

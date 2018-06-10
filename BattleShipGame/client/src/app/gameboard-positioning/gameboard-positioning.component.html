@@ -1,6 +1,12 @@
 <div id="gameboard">
   <div *ngFor="let tile of tiles" id={{tile.id}} [ngStyle]="{'top': tile.top, 'left': tile.left}" (click)="toggle($event)">   
   </div>
-  <h6 *ngIf="info()" [ngStyle]="{'position':'absolute', 'top': '520px'}" >Click on a boat from the right corner and then click where you want to place it on the board!</h6>
-  <button *ngIf="continue()" [ngStyle]="{'position':'absolute', 'top': '520px'}" (click)="play()">Continue</button>
+  
+</div>
+
+<div class="container" id="cont">
+    <h6 *ngIf="info()" >Click on a boat from the right corner and then click where you want to place it on the board!</h6>
+    <button *ngIf="continue()" (click)="play()">Continue</button>
+    <div *ngIf="wait"[ngStyle]="{'color':'blue'}"><b>{{wait}}</b></div>
+
 </div>

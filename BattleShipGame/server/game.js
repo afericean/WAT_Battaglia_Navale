@@ -7,6 +7,9 @@ class Game {
         this.privateMsgArray = new Array();
         this.idPlayerOne = id;
         this.full = false;
+        this.readyPlayerOne = false;
+        this.readyPlayerTwo = false;
+        this.finished = false;
         console.log("Game created in server by: " + this.idPlayerOne.toString);
     }
     addMessage(m) {

@@ -13,7 +13,9 @@ import { MessageHttpService } from '../message-http.service';
   styleUrls: ['./gameboard-positioning.component.css']
 })
 export class GameboardPositioningComponent implements OnInit {
+  private intervalID;
   tiles: Tile[] = new Array();
+  wait: string;
   constructor(private ps : PositioningService, private router: Router,private mhs: MessageHttpService) {}
 
   ngOnInit() {
@@ -200,6 +202,16 @@ continue(): boolean
     return false;
 }
 
+
+public send_continue(){
+  console.log("Sending continue : ");
+  this.mhs.send_continue().subscribe( (ok) => {
+    console.log(" returned "+JSON.stringify(ok));
+  }, (error) => {
+    console.log('Error occurred while sending continue: ' + error);
+  });
+}
+
 sendShip(s : Ship)
 {
   console.log("Sending ships : ");
@@ -218,12 +230,32 @@ info(): boolean{
     return false;
 }
 
+public get_start(){
+  console.log("Getting start : ");
+  this.mhs.get_start().subscribe( (ok) => {
+    console.log(" returned "+JSON.stringify(ok));
+    if(ok)
+    {
+      if (this.intervalID) {
+        clearInterval(this.intervalID);
+      }
+      this.router.navigate(['/playing']);
+    }
+    else{
+      this.wait="Waiting for the other player..."
+    }
+  }, (error) => {
+    console.log('Error occurred while getting start: ' + error);
+  });
+}
+
 play(){
   for(var i=0;i<this.ps.Ships.length;i++)
   {
     this.sendShip(this.ps.Ships[i]);
   }
-  this.router.navigate(['/playing']);
+  this.send_continue();
+  this.intervalID = setInterval(this.get_start.bind(this), 2000);
 }
 
 }

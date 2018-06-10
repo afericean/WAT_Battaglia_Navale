@@ -46,7 +46,13 @@
  *
  *     /getX              -                  GET          Get the hit
  *
- *     /victory           -                  GET
+ *     /victory           -                  GET          Get if you won / lost
+ *
+ *    /continue           -                  GET          Send ready
+ *
+ *    /start              -                  GET          Get to playing phase
+ *
+ *    /remove             -                  GET          Removing finished games
  * ------------------------------------------------------------------------------------
  *  To install the required modules:
  *  $ npm install
@@ -324,19 +330,87 @@ app.get('/victory', (req, res, next) => {
         if (won && lost == false) {
             user.points += 2;
             user.win += 1;
+            for (var i = 0; i < games.length; i++) {
+                if (games[i].gameID == gameid && games[i].getFull()) {
+                    games[i].finished = true;
+                    console.log("Game " + gameid + " set on finished " + games[i].finished);
+                }
+            }
         }
         else if (won == false && lost) {
             user.points -= 1;
             user.lost += 1;
+            for (var i = 0; i < games.length; i++) {
+                if (games[i].gameID == gameid && games[i].getFull()) {
+                    games[i].finished = true;
+                    console.log("Game " + gameid + " set on finished " + games[i].finished);
+                }
+            }
         }
         else if (won && lost) {
             user.points -= 1;
             user.lost += 1;
+            for (var i = 0; i < games.length; i++) {
+                if (games[i].gameID == gameid && games[i].getFull()) {
+                    games[i].finished = true;
+                    console.log("Game " + gameid + " set on finished " + games[i].finished);
+                }
+            }
         }
         user.save();
     });
     console.log("To be sent after shot : " + JSON.stringify({ "won": won, "lost": lost }));
     return res.status(200).json({ "won": won, "lost": lost });
+});
+app.get('/continue', (req, res, next) => {
+    console.log("Query: " + JSON.stringify(req.query));
+    var id = req.query.id;
+    var gameid = req.query.gameid;
+    var ok;
+    for (var i = 0; i < games.length; i++) {
+        if (games[i].gameID == gameid && games[i].getFull()) {
+            if (games[i].idPlayerOne == id) {
+                games[i].readyPlayerOne = true;
+                ok = true;
+            }
+            else if (games[i].idPlayerTwo == id) {
+                games[i].readyPlayerTwo = true;
+                ok = true;
+            }
+        }
+    }
+    console.log("Continue sent : " + JSON.stringify(ok));
+    return res.status(200).json(ok);
+});
+app.get('/start', (req, res, next) => {
+    console.log("Query: " + JSON.stringify(req.query));
+    var gameid = req.query.gameid;
+    var ok = false;
+    for (var i = 0; i < games.length; i++) {
+        if (games[i].gameID == gameid && games[i].getFull()) {
+            if (games[i].readyPlayerOne && games[i].readyPlayerTwo) {
+                ok = true;
+            }
+        }
+    }
+    console.log("Start sent : " + JSON.stringify(ok));
+    return res.status(200).json(ok);
+});
+app.get('/remove', (req, res, next) => {
+    console.log("Removing finished games");
+    var removed = null;
+    //console.log("Length of games before removal: "+games.length);
+    if (games.length) {
+        for (var i = 0; i < games.length; i++) {
+            if (games[i].finished) {
+                console.log("Found finished game : " + games[i].gameID);
+                removed = games.splice(i, 1);
+            }
+        }
+    }
+    console.log("Removed game : " + removed);
+    //console.log("Length of games after removal: "+games.length);
+    return res.status(200).json(removed);
 });
 app.delete('/messages/:id', auth, (req, res, next) => {
     // Check moderator role
