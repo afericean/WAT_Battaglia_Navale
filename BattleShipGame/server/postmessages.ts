@@ -401,7 +401,7 @@ app.get('/victory' , (req,res,next) => {
         }
       }
   }
-  // req.params.mail contains the :mail URL component
+
   user.getModel().findOne( {username: id }, {digest: 0, salt:0 }).then( (user)=> {
     console.log("Updating user "+id);
     if(won&&lost==false)
@@ -530,16 +530,20 @@ app.delete( '/messages/:id', auth, (req,res,next) => {
 
 });
 
+app.route("/users").get( auth, (req,res,next) => {
 
+  var filter = {};
+  console.log("Using filter: " + JSON.stringify(filter) );
+  console.log(" Using query: " + JSON.stringify(req.query) );
 
-app.get('/users', auth, (req,res,next) => {
+  req.query.skip = parseInt( req.query.skip || "0" ) || 0;
+  req.query.limit = parseInt( req.query.limit || "10" ) || 20;
 
-  user.getModel().find( {}, {digest:0, salt:0} ).then( (users) => {
+  user.getModel().find( filter ).sort({points:-1}).skip( req.query.skip ).limit( req.query.limit ).then( (users) => {
     return res.status(200).json( users );
   }).catch( (reason) => {
     return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
   })
-
 });
 
 app.post('/users', (req,res,next) => {

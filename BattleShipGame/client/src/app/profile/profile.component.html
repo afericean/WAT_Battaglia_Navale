@@ -16,23 +16,48 @@
         </div>
       </li>
     </ul>
-
 </nav>
+<br><br>
 
+<div class="container" align="center">
 <table>
     <tr class="dropdown-item" href="#">
-      <td width="200px"><h3>Points:</h3></td> 
+      <td width="200px"><h4>Points:</h4></td> 
       <td><h5>{{us.get_points()}}</h5></td>
     </tr>
     <tr class="dropdown-item" href="#">
-      <td width="200px"><h3>Won games: </h3></td>
+      <td width="200px"><h4>Won games: </h4></td>
       <td><h5>{{us.get_win()}}</h5></td>
     </tr> 
     <tr class="dropdown-item" href="#">
-      <td width="200px"><h3>Lost games:</h3></td>
+      <td width="200px"><h4>Lost games:</h4></td>
       <td><h5>{{us.get_lost()}}</h5></td>
     </tr> 
 </table>
 
+</div>
+<br><br><br><br>
 
+<div class="container" align="center">
+  <h3>Ranking</h3> <br>
+  <div *ngIf="users.length">
+    <table >
+      <tr> 
+          <td width="200px" height="50px" [ngStyle]="{'background-color': '#00ccff','text-align':'center'}"><h5>Username</h5></td>
+          <td width="100px" [ngStyle]="{'background-color': '#00ccff','text-align':'center'}"><h5>Points</h5></td>
+          <td width="100px" [ngStyle]="{'background-color': '#00ccff','text-align':'center'}"><h5>Victory</h5></td>
+          <td width="100px" [ngStyle]="{'background-color': '#00ccff','text-align':'center'}"><h5>Defeats</h5></td>
+        </tr>
+      </table>
+    <table *ngFor="let user of users" >  
+      <tr>
+        <td width="200px" height="50px" [ngStyle]="{'background-color': ' #ccffff','text-align':'center'}">{{user.username}}</td>
+        <td width="100px" [ngStyle]="{'background-color': ' #ccffff','text-align':'center'}">{{user.points}}</td>
+        <td width="100px" [ngStyle]="{'background-color': ' #ccffff','text-align':'center'}">{{user.win}}</td>
+        <td width="100px" [ngStyle]="{'background-color': ' #ccffff','text-align':'center'}">{{user.lost}}</td>
+      </tr> 
+    </table>
+  
+  </div> 
+</div>
 

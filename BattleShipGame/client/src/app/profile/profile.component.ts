@@ -10,12 +10,14 @@ import { MessageHttpService } from '../message-http.service';
 })
 export class ProfileComponent implements OnInit {
 
+  private users: any[] = [];
+
   constructor(private us: UserService, private router: Router, private mhs: MessageHttpService) { }
 
   ngOnInit() {
-    //this.get_users();
-    /*this.us.renew().subscribe( (d) => {
-      console.log('Renew succeded: ' + JSON.stringify(d) );
+    this.get_users();
+    /*this.us.renew().subscribe( () => {
+      console.log('Renew succeded: ' + this.us.get_id() );
       //this.router.navigate(['/game-room']);
     }, (err) => {
       console.log('Renew error: ' + JSON.stringify(err.error.errormessage) );
@@ -28,6 +30,7 @@ export class ProfileComponent implements OnInit {
     this.mhs.get_users().subscribe(
       ( users ) => {
         console.log(users);
+        this.users = users;
       }, (error) => {
         console.log('Error occurred while getting the users: ' + error);
     });

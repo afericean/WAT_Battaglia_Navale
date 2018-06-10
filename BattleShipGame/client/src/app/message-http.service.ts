@@ -59,7 +59,7 @@ export class MessageHttpService {
   }
 
   get_users(): Observable<any> {
-    return this.http.get<any>( this.us.url + '/users'/*, this.create_options( {limit: '10', skip: '0'} )*/ ).pipe(
+    return this.http.get<any>( this.us.url + '/users', this.create_options( {limit: '10', skip: '0'} ) ).pipe(
       tap( (data) => console.log(JSON.stringify(data))) ,
       catchError( this.handleError )
     );
